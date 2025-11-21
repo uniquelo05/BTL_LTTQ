@@ -108,12 +108,6 @@
     <Compile Include="GUI\formLichGiangDay.Designer.cs">
       <DependentUpon>formLichGiangDay.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\formLopHP.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\formLopHP.Designer.cs">
-      <DependentUpon>formLopHP.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\formLopTC.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,9 +178,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\formLichGiangDay.resx">
       <DependentUpon>formLichGiangDay.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\formLopHP.resx">
-      <DependentUpon>formLopHP.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\formLopTC.resx">
       <DependentUpon>formLopTC.cs</DependentUpon>

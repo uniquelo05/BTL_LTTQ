@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BTL_LTTQ.BLL.Subject;
 using BTL_LTTQ.DTO;
+using System.IO;
 
 namespace BTL_LTTQ
 {
@@ -140,6 +141,7 @@ namespace BTL_LTTQ
             btnRefresh.Click += BtnRefresh_Click;
             btnTimKiem.Click += BtnTimKiem_Click;
             btnTatCa.Click += BtnTatCa_Click;
+            btnXuatExcel.Click += BtnXuatExcel_Click;
             
             // Sự kiện click trên DataGridView
             dgvSV.CellClick += DgvSV_CellClick;
@@ -413,6 +415,91 @@ namespace BTL_LTTQ
             tbTietTH.Clear();
             cbbMaKhoa.SelectedIndex = 0;
         }
+
+        #region Excel Export
+
+        private void BtnXuatExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dgvSV.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không có dữ liệu môn học để xuất!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Excel Files (*.csv)|*.csv|All Files (*.*)|*.*";
+                sfd.FileName = $"DanhSach_MonHoc_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                sfd.Title = "Lưu file Excel";
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    ExportToCSV_MonHoc(sfd.FileName);
+
+                    MessageBox.Show($"✅ XUẤT FILE THÀNH CÔNG!\n\nĐường dẫn: {sfd.FileName}",
+                        "Xuất Excel thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi xuất file: {ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExportToCSV_MonHoc(string filePath)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
+            {
+                sb.AppendLine("DANH SÁCH MÔN HỌC");
+                sb.AppendLine($"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
+                sb.AppendLine();
+
+                // Ghi header các cột (chỉ các cột hiển thị)
+                var headers = dgvSV.Columns.Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .Select(c => EscapeCSV(c.HeaderText));
+                sb.AppendLine(string.Join(",", headers));
+
+                // Ghi dữ liệu từng dòng
+                foreach (DataGridViewRow row in dgvSV.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    var cells = dgvSV.Columns.Cast<DataGridViewColumn>()
+                        .Where(c => c.Visible)
+                        .Select(c =>
+                        {
+                            var cellValue = row.Cells[c.Index].Value;
+                            return EscapeCSV(cellValue?.ToString() ?? "");
+                        });
+
+                    sb.AppendLine(string.Join(",", cells));
+                }
+
+                sw.Write(sb.ToString());
+            }
+        }
+
+        private string EscapeCSV(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "\"\"";
+
+            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+            {
+                value = value.Replace("\"", "\"\"");
+                return $"\"{value}\"";
+            }
+
+            return value;
+        }
+
+        #endregion
 
         private void label2_Click(object sender, EventArgs e)
         {

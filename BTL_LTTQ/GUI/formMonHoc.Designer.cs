@@ -68,6 +68,7 @@
             this.tbHeSoThi = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnXuatExcel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSV)).BeginInit();
             this.panel1.SuspendLayout();
             this.btnRefresh.SuspendLayout();
@@ -475,7 +476,6 @@
             this.labelHeSoDQT.Size = new System.Drawing.Size(100, 20);
             this.labelHeSoDQT.TabIndex = 38;
             this.labelHeSoDQT.Text = "Hệ số DQT:";
-            //this.labelHeSoDQT.Click += new System.EventHandler(this.labelHeSoDQT_Click);
             // 
             // tbHeSoDQT
             // 
@@ -494,7 +494,6 @@
             this.labelHeSoThi.Size = new System.Drawing.Size(87, 20);
             this.labelHeSoThi.TabIndex = 40;
             this.labelHeSoThi.Text = "Hệ số Thi:";
-            //this.labelHeSoThi.Click += new System.EventHandler(this.labelHeSoThi_Click);
             // 
             // tbHeSoThi
             // 
@@ -527,11 +526,28 @@
             this.label4.TabIndex = 12;
             this.label4.Text = "Tìm kiếm";
             // 
+            // btnXuatExcel
+            // 
+            this.btnXuatExcel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
+            this.btnXuatExcel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnXuatExcel.FlatAppearance.BorderSize = 0;
+            this.btnXuatExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnXuatExcel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnXuatExcel.ForeColor = System.Drawing.Color.White;
+            this.btnXuatExcel.Location = new System.Drawing.Point(81, 62);
+            this.btnXuatExcel.Margin = new System.Windows.Forms.Padding(4);
+            this.btnXuatExcel.Name = "btnXuatExcel";
+            this.btnXuatExcel.Size = new System.Drawing.Size(200, 35);
+            this.btnXuatExcel.TabIndex = 14;
+            this.btnXuatExcel.Text = "📊 Xuất Excel";
+            this.btnXuatExcel.UseVisualStyleBackColor = false;
+            // 
             // formMonHoc
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1469, 796);
+            this.Controls.Add(this.btnXuatExcel);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.dgvSV);
             this.Controls.Add(this.panel1);
@@ -603,5 +619,6 @@
         private System.Windows.Forms.Label labelHeSoDQT;
         private System.Windows.Forms.TextBox tbHeSoThi;
         private System.Windows.Forms.Label labelHeSoThi;
+        private System.Windows.Forms.Button btnXuatExcel;
     }
 }
