@@ -1,0 +1,257 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BTL_LTTQ.BLL.Diem; // Import BLL
+using BTL_LTTQ.DTO;       // Import DTO
+using Excel = Microsoft.Office.Interop.Excel;
+
+namespace BTL_LTTQ
+{
+    public partial class formDiem : Form
+    {
+        // Khai báo đối tượng BLL để giao tiếp với tầng nghiệp vụ
+        private DiemBLL diemBLL = new DiemBLL();
+
+        public formDiem()
+        {
+            InitializeComponent();
+
+            // Chỉ gọi LoadData() 1 lần duy nhất
+            LoadData();
+
+            // Gán sự kiện
+            btn_ThemDiem.Click += BtnThem_Click;
+            btn_SuaDiem.Click += BtnSua_Click;
+            btn_XoaDiem.Click += BtnXoa_Click;
+            btn_LamMoiDiem.Click += BtnLamMoi_Click;
+            btnTimKiem.Click += BtnTim_Click;
+            btnTatCa.Click += BtnTatCa_Click;
+            dgvDiem.CellClick += DataGridView1_CellClick;
+            btnXuatExcel.Click += BtnXuatExcel_Click;
+
+        }
+
+        // ----------------------------------------------------------------------
+        // CÁC HÀM TIỆN ÍCH
+        // ----------------------------------------------------------------------
+
+        /// <summary>
+        /// Tải dữ liệu điểm lên DataGridView
+        /// </summary>
+        private void LoadData()
+        {
+            try
+            {
+                DataTable dt = diemBLL.LayDanhSach();
+
+                // Cách 1: Đơn giản hơn - chỉ cần set DataSource trực tiếp
+                dgvDiem.DataSource = dt;
+
+                // Refresh UI
+                dgvDiem.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        /// <summary>
+        /// Lấy dữ liệu từ các control trên Form và tạo đối tượng Score
+        /// </summary>
+        private Score GetScoreFromInputs()
+        {
+            double diemCC, diemGK, diemThi;
+
+            // Cố gắng chuyển đổi chuỗi điểm thành số double, nếu không thành công thì đặt là 0
+            Double.TryParse(txtDiemCC.Text, out diemCC);
+            Double.TryParse(txtDiemGK.Text, out diemGK);
+            Double.TryParse(txtDiemThi.Text, out diemThi);
+
+            return new Score
+            {
+                MaLop = txtMaLop.Text.Trim(),
+                MaSV = txtMaSV.Text.Trim(),
+                DiemCc = diemCC,
+                DiemGK = diemGK,
+                DiemThi = diemThi
+            };
+        }
+
+        /// <summary>
+        /// Xóa trắng các trường nhập liệu
+        /// </summary>
+        private void ClearInputs()
+        {
+            txtMaLop.Clear();
+            txtMaSV.Clear();
+            txtTenSV.Clear();
+            txtDiemCC.Text = "0";
+            txtDiemGK.Text = "0";
+            txtDiemThi.Text = "0";
+            txtMaLop.Focus();
+        }
+        
+
+        private void XuatRaExcel(DataGridView dgv)
+            {
+                try
+                {
+                    // Tạo ứng dụng Excel
+                    Excel.Application excelApp = new Excel.Application();
+                    excelApp.Application.Workbooks.Add(Type.Missing);
+
+                    // Đặt tiêu đề cột
+                    for (int i = 1; i <= dgv.Columns.Count; i++)
+                    {
+                        excelApp.Cells[1, i] = dgv.Columns[i - 1].HeaderText;
+                    }
+
+                    // Ghi dữ liệu từng dòng
+                    for (int i = 0; i < dgv.Rows.Count; i++)
+                    {
+                        for (int j = 0; j < dgv.Columns.Count; j++)
+                        {
+                            excelApp.Cells[i + 2, j + 1] = dgv.Rows[i].Cells[j].Value?.ToString();
+                        }
+                    }
+
+                    // Hiện file Excel lên màn hình
+                    excelApp.Visible = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi xuất Excel: " + ex.Message);
+                }
+            }
+
+    // ----------------------------------------------------------------------
+    // CÁC SỰ KIỆN CLICK NÚT
+    // ----------------------------------------------------------------------
+
+    private void BtnLamMoi_Click(object sender, EventArgs e)
+        {
+            ClearInputs();
+        }
+
+        private void BtnThem_Click(object sender, EventArgs e)
+        {
+            Score newScore = GetScoreFromInputs();
+            string result = diemBLL.ThemDiem(newScore);
+
+            MessageBox.Show(result);
+            if (result.Contains("Thêm thành công!"))
+            {
+                LoadData();
+                ClearInputs();
+            }
+        }
+
+        private void BtnSua_Click(object sender, EventArgs e)
+        {
+            Score scoreToUpdate = GetScoreFromInputs();
+            string result = diemBLL.SuaDiem(scoreToUpdate);
+
+            MessageBox.Show(result);
+            if (result.Contains("Sửa thành công!"))
+            {
+                LoadData();
+                ClearInputs();
+            }
+        }
+
+        private void BtnXoa_Click(object sender, EventArgs e)
+        {
+            // Cần Mã Lớp và Mã SV để xóa chính xác
+            string maLop = txtMaLop.Text.Trim();
+            string maSV = txtMaSV.Text.Trim();
+
+            if (string.IsNullOrEmpty(maLop) || string.IsNullOrEmpty(maSV))
+            {
+                MessageBox.Show("Vui lòng chọn hoặc nhập Mã Lớp và Mã SV cần xóa.", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa điểm của SV {maSV} trong lớp {maLop}?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                string result = diemBLL.XoaDiem(maLop, maSV);
+                MessageBox.Show(result);
+                if (result.Contains("Xóa thành công!"))
+                {
+                    LoadData();
+                    ClearInputs();
+                }
+            }
+        }
+
+
+        private void BtnTim_Click(object sender, EventArgs e)
+        {
+            string maLop = txtTimKiemTheoMaLop.Text.Trim();
+            string maSV = txtTimKiemTheoMaSV.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(maLop) && string.IsNullOrWhiteSpace(maSV))
+            {
+                MessageBox.Show("Vui lòng nhập ít nhất Mã lớp hoặc Mã SV để tìm kiếm.", "Cảnh báo");
+                return;
+            }
+
+            DataTable dt = diemBLL.TimKiem(maLop, maSV);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                dgvDiem.DataSource = dt;
+                dgvDiem.Refresh();
+            }
+            else
+            {
+                MessageBox.Show("Không tìm thấy dữ liệu phù hợp.", "Thông báo");
+                dgvDiem.DataSource = null;
+            }
+        }
+
+
+
+        private void BtnTatCa_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+        private void BtnXuatExcel_Click(object sender, EventArgs e)
+        {
+            if (dgvDiem.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu để xuất.");
+                return;
+            }
+
+            XuatRaExcel(dgvDiem);
+        }
+
+        // ----------------------------------------------------------------------
+        // SỰ KIỆN CHỌN HÀNG TRONG DATAGRIDVIEW
+        // ----------------------------------------------------------------------
+
+        private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvDiem.Rows[e.RowIndex];
+
+                // Đổ dữ liệu từ hàng được chọn vào các TextBox
+                txtMaLop.Text = row.Cells["MaLop"].Value.ToString();
+                txtTenSV.Text= row.Cells["TenSV"].Value.ToString();
+                txtMaSV.Text = row.Cells["MaSV"].Value.ToString();
+                txtDiemCC.Text = row.Cells["DiemCC"].Value.ToString();
+                txtDiemGK.Text = row.Cells["DiemGK"].Value.ToString();
+                txtDiemThi.Text = row.Cells["DiemThi"].Value.ToString();
+            }
+        }
+    }
+}

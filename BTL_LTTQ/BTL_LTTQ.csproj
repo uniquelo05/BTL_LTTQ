@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AF75C263-459C-415B-ABA0-777FC979B095}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>BTL_LTTQ</RootNamespace>
+    <AssemblyName>BTL_LTTQ</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Office.Interop.Excel.16.0.18925.20022\lib\net40\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BLL\PhanCong\PhanCongBLL.cs" />
+    <Compile Include="DAL\PhanCong\PhanCongDAL.cs" />
+    <Compile Include="DTO\PhanCongDTO.cs" />
+    <Compile Include="BLL\SinhVien\SinhVienBLL.cs" />
+    <Compile Include="DAL\SinhVien\SinhVienDAL.cs" />
+    <Compile Include="DTO\SinhVienDTO.cs" />
+    <Compile Include="DTO\Subject.cs" />
+    <Compile Include="DAL\Subject\SubjectDAL.cs" />
+    <Compile Include="BLL\Subject\SubjectBLL.cs" />
+    <Compile Include="DTO\Score.cs" />
+    <Compile Include="DAL\DatabaseConnection.cs" />
+    <Compile Include="BLL\Session\UserSession.cs" />
+    <Compile Include="DAL\Diem\DiemDAL.cs" />
+    <Compile Include="BLL\Diem\DiemBLL.cs" />
+    <Compile Include="DAL\Login\LoginDAL.cs" />
+    <Compile Include="BLL\Login\LoginBLL.cs" />
+    <Compile Include="BLL\GiangVien\GiangVien_BLL.cs" />
+    <Compile Include="DTO\GiangVien\GiangVien_DTO.cs" />
+    <Compile Include="DAL\GiangVien\GiangVien_DAL.cs" />
+    <Compile Include="DTO\LopTC\LopTC_DTO.cs" />
+    <Compile Include="DAL\LopTC\LopTC_DAL.cs" />
+    <Compile Include="DAL\LopTC\Khoa_DAL.cs" />
+    <Compile Include="DAL\LopTC\MonHoc_DAL.cs" />
+    <Compile Include="BLL\LopTC\LopTC_BLL.cs" />
+    <Compile Include="DAL\Schedule\ScheduleDAL.cs" />
+    <Compile Include="DTO\ScheduleDTO.cs" />
+    <Compile Include="BLL\Schedule\ScheduleBLL.cs" />
+    <Compile Include="DTO\UserInfo.cs" />
+    <Compile Include="GUI\BaoCao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\BaoCao.Designer.cs">
+      <DependentUpon>BaoCao.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formDiem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formDiem.Designer.cs">
+      <DependentUpon>formDiem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formGV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formGV.Designer.cs">
+      <DependentUpon>formGV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formLichGiangDay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formLichGiangDay.Designer.cs">
+      <DependentUpon>formLichGiangDay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formLopHP.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formLopHP.Designer.cs">
+      <DependentUpon>formLopHP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formLopTC.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formLopTC.Designer.cs">
+      <DependentUpon>formLopTC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formMonHoc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formMonHoc.Designer.cs">
+      <DependentUpon>formMonHoc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formSV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formPhanCongGV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\formPhanCongGV.Designer.cs">
+      <DependentUpon>formPhanCongGV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\formSV.Designer.cs">
+      <DependentUpon>formSV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\InBaoCao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\InBaoCao.Designer.cs">
+      <DependentUpon>InBaoCao.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Loading.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Loading.Designer.cs">
+      <DependentUpon>Loading.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Loadthu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Loadthu.Designer.cs">
+      <DependentUpon>Loadthu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GUI\BaoCao.resx">
+      <DependentUpon>BaoCao.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formDiem.resx">
+      <DependentUpon>formDiem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formGV.resx">
+      <DependentUpon>formGV.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formLichGiangDay.resx">
+      <DependentUpon>formLichGiangDay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formLopHP.resx">
+      <DependentUpon>formLopHP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formLopTC.resx">
+      <DependentUpon>formLopTC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formMonHoc.resx">
+      <DependentUpon>formMonHoc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\formSV.resx">
+      <DependentUpon>formSV.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Loading.resx">
+      <DependentUpon>Loading.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Loadthu.resx">
+      <DependentUpon>Loadthu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Database\QL_GiangDay.sql" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
