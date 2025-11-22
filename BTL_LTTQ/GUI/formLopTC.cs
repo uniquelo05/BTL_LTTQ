@@ -3,48 +3,52 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
-using System.Linq; // Cần giữ lại
+using System.Linq;
 using System.Windows.Forms;
 using BTL_LTTQ.BLL;
 using BTL_LTTQ.DTO;
 using BTL_LTTQ.DAL;
 using System.IO;
 using System.Text;
-using System.Linq;
 
 namespace BTL_LTTQ
 {
     public partial class formLopTC : Form
     {
         private readonly LopTC_BLL bll = new LopTC_BLL();
-
         private const string placeholderMaLop = "nhập mã lớp";
 
         public formLopTC()
         {
             InitializeComponent();
+            this.Load += formLopTC_Load;
         }
 
         #region Form Load
 
         private void formLopTC_Load(object sender, EventArgs e)
         {
-            LoadDataGridView();
-            LoadComboBoxes();
-            AttachEventHandlers();
-            ClearFields();
-            SetPlaceholderText();
-
-            dgvSV.AutoGenerateColumns = false;
-            SetupDataGridViewColumns();
+            try
+            {
+                dgvSV.AutoGenerateColumns = false;
+                SetupDataGridViewColumns();
+                LoadDataGridView();
+                LoadComboBoxes();
+                AttachEventHandlers();
+                SetPlaceholderText();
+                ClearFields();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khởi tạo form: {ex.Message}", "Lỗi", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-
 
         private void SetupDataGridViewColumns()
         {
             dgvSV.Columns.Clear();
 
-            // Mã Lớp
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "MaLop",
@@ -53,7 +57,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
-            // Mã Môn Học
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "MaMH",
@@ -62,7 +65,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
-            // Tên Môn Học
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "TenMH",
@@ -71,7 +73,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
-            // Khoa
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "MaKhoa",
@@ -80,7 +81,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
-            // Học kỳ
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "HocKy",
@@ -89,7 +89,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
-            // Năm học
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "NamHoc",
@@ -98,7 +97,6 @@ namespace BTL_LTTQ
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
-            // Tình Trạng Lớp
             dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 DataPropertyName = "TinhTrangLop",
@@ -108,25 +106,25 @@ namespace BTL_LTTQ
             });
         }
 
-
         private void AttachEventHandlers()
         {
-            btnThem.Click += new EventHandler(btnThem_Click);
-            btnSua.Click += new EventHandler(btnSua_Click);
-            btnXoa.Click += new EventHandler(btnXoa_Click);
-            btnRefresh.Click += new EventHandler(btnRefresh_Click);
-            btnTimKiem.Click += new EventHandler(btnTimKiem_Click);
-            btnTatCa.Click += new EventHandler(btnTatCa_Click);
-            dgvSV.CellClick += new DataGridViewCellEventHandler(dgvSV_CellClick);
-            tbTimKiemTheoTen.Enter += new EventHandler(tbTimKiemTheoTen_Enter);
-            tbTimKiemTheoTen.Leave += new EventHandler(tbTimKiemTheoTen_Leave);
-            cbbMaKhoa.SelectedIndexChanged += new EventHandler(cbbMaKhoa_SelectedIndexChanged);
-
-            // ĐÃ THÊM: Thêm sự kiện để format cột BIT (0/1)
-            // Đây chính là code sửa lỗi FormatException trong ảnh của bạn
-            dgvSV.CellFormatting += new DataGridViewCellFormattingEventHandler(dgvSV_CellFormatting);
-            btnXuatExcel.Click += new EventHandler(btnXuatExcel_Click);
+            btnThem.Click += btnThem_Click;
+            btnSua.Click += btnSua_Click;
+            btnXoa.Click += btnXoa_Click;
+            btnLamMoi.Click += btnLamMoi_Click; // ✅ ĐỔI TỪ btnRefresh
+            btnSearch.Click += btnSearch_Click; // ✅ ĐỔI TỪ btnTimKiem
+            btnRefreshSearch.Click += btnRefreshSearch_Click; // ✅ ĐỔI TỪ btnTatCa
+            dgvSV.CellClick += dgvSV_CellClick;
+            txtTimKiemTheoTen.Enter += txtTimKiemTheoTen_Enter; // ✅ ĐỔI TỪ tbTimKiemTheoTen
+            txtTimKiemTheoTen.Leave += txtTimKiemTheoTen_Leave; // ✅ ĐỔI TỪ tbTimKiemTheoTen
+            cbbMaKhoa.SelectedIndexChanged += cbbMaKhoa_SelectedIndexChanged;
+            dgvSV.CellFormatting += dgvSV_CellFormatting;
+            btnXuatExcel.Click += btnXuatExcel_Click;
         }
+
+        #endregion
+
+        #region Export Excel
 
         private void btnXuatExcel_Click(object sender, EventArgs e)
         {
@@ -146,8 +144,7 @@ namespace BTL_LTTQ
 
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    ExportToCSV_LTC(sfd.FileName); // Gọi hàm export
-
+                    ExportToCSV_LTC(sfd.FileName);
                     MessageBox.Show($"✅ XUẤT FILE THÀNH CÔNG!\n\nĐường dẫn: {sfd.FileName}",
                         "Xuất Excel thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -163,20 +160,17 @@ namespace BTL_LTTQ
         {
             StringBuilder sb = new StringBuilder();
 
-            // Sử dụng StreamWriter với Encoding.UTF8
             using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
             {
                 sb.AppendLine("DANH SÁCH LỚP TÍN CHỈ");
                 sb.AppendLine($"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
                 sb.AppendLine();
 
-                // Ghi header các cột (chỉ các cột hiển thị)
                 var headers = dgvSV.Columns.Cast<DataGridViewColumn>()
                     .Where(c => c.Visible)
                     .Select(c => EscapeCSV(c.HeaderText));
                 sb.AppendLine(string.Join(",", headers));
 
-                // Ghi dữ liệu từng dòng
                 foreach (DataGridViewRow row in dgvSV.Rows)
                 {
                     if (row.IsNewRow) continue;
@@ -186,14 +180,10 @@ namespace BTL_LTTQ
                         .Select(c =>
                         {
                             var cellValue = row.Cells[c.Index].Value;
-
-                            // ✅ Xử lý cột TinhTrangLop (đã được format)
                             if (c.Name == "TinhTrangLop")
                             {
-                                // Lấy giá trị đã được format từ sự kiện CellFormatting
                                 return EscapeCSV(row.Cells[c.Index].FormattedValue?.ToString() ?? "Chưa phân công");
                             }
-
                             return EscapeCSV(cellValue?.ToString() ?? "");
                         });
 
@@ -204,7 +194,6 @@ namespace BTL_LTTQ
             }
         }
 
-        // Tái sử dụng hàm EscapeCSV (thường được đặt trong một lớp tiện ích chung)
         private string EscapeCSV(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -221,27 +210,34 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region Phương thức Helper (Tải dữ liệu, Xóa trường)
+        #region Load Data
 
         private void LoadDataGridView()
         {
             try
             {
-                DataTable dt = bll.LoadDanhSachLTC(); // Gọi BLL
+                DataTable dt = bll.LoadDanhSachLTC();
                 dgvSV.DataSource = dt;
 
-                dgvSV.Columns["MaLop"].HeaderText = "Mã Lớp";
-                dgvSV.Columns["MaMH"].HeaderText = "Mã Môn Học";
-                dgvSV.Columns["TenMH"].HeaderText = "Tên Môn Học";
-                dgvSV.Columns["MaKhoa"].HeaderText = "Mã Khoa";
-                dgvSV.Columns["HocKy"].HeaderText = "Học Kỳ";
-                dgvSV.Columns["NamHoc"].HeaderText = "Năm Học";
-                // ĐÃ SỬA: Đổi tên cột
-
+                if (dgvSV.Columns["MaLop"] != null) 
+                    dgvSV.Columns["MaLop"].HeaderText = "Mã Lớp";
+                if (dgvSV.Columns["MaMH"] != null) 
+                    dgvSV.Columns["MaMH"].HeaderText = "Mã Môn Học";
+                if (dgvSV.Columns["TenMH"] != null) 
+                    dgvSV.Columns["TenMH"].HeaderText = "Tên Môn Học";
+                if (dgvSV.Columns["MaKhoa"] != null) 
+                    dgvSV.Columns["MaKhoa"].HeaderText = "Mã Khoa";
+                if (dgvSV.Columns["HocKy"] != null) 
+                    dgvSV.Columns["HocKy"].HeaderText = "Học Kỳ";
+                if (dgvSV.Columns["NamHoc"] != null) 
+                    dgvSV.Columns["NamHoc"].HeaderText = "Năm Học";
+                if (dgvSV.Columns["TinhTrangLop"] != null) 
+                    dgvSV.Columns["TinhTrangLop"].HeaderText = "Tình Trạng";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"❌ LỖI TẢI DỮ LIỆU:\n\n{ex.Message}", 
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -249,7 +245,7 @@ namespace BTL_LTTQ
         {
             try
             {
-                DataTable dtKhoa = bll.LoadDanhSachKhoa(); // Gọi BLL
+                DataTable dtKhoa = bll.LoadDanhSachKhoa();
 
                 cbbMaKhoa.DataSource = dtKhoa;
                 cbbMaKhoa.DisplayMember = "TenKhoa";
@@ -268,9 +264,6 @@ namespace BTL_LTTQ
                 cbbTimTheoKhoa.SelectedIndex = 0;
 
                 LoadMonHocComboBox(null);
-
-                // ĐÃ SỬA: Xóa toàn bộ phần 'cbbTinhTrang'
-                // vì control này không còn tồn tại trên Designer
             }
             catch (Exception ex)
             {
@@ -282,7 +275,7 @@ namespace BTL_LTTQ
         {
             try
             {
-                DataTable dtMonHoc = bll.LoadDanhSachMonHoc(maKhoa); // Gọi BLL
+                DataTable dtMonHoc = bll.LoadDanhSachMonHoc(maKhoa);
                 cbbMaMon.DataSource = dtMonHoc;
                 cbbMaMon.DisplayMember = "TenMH";
                 cbbMaMon.ValueMember = "MaMH";
@@ -296,27 +289,24 @@ namespace BTL_LTTQ
 
         private void ClearFields()
         {
-            tbMaLop.Text = "";
-            numericUpDownHocky.Value = 1;
-            tbNamHoc.Text = "";
+            txtMaLop.Text = ""; // ✅ ĐỔI TỪ tbMaLop
+            numHocKy.Value = 1; // ✅ ĐỔI TỪ numericUpDownHocky
+            txtNamHoc.Text = ""; // ✅ ĐỔI TỪ tbNamHoc
             cbbMaKhoa.SelectedIndex = -1;
             cbbMaMon.SelectedIndex = -1;
-
-            // ĐÃ SỬA: Xóa 'cbbTinhTrang'
-
-            tbMaLop.ReadOnly = false;
-            tbMaLop.Focus();
+            txtMaLop.ReadOnly = false;
+            txtMaLop.Focus();
         }
 
         private LopTC_DTO GetLopTinChiFromGUI()
         {
             LopTC_DTO ltc = new LopTC_DTO();
-            ltc.MaLop = tbMaLop.Text.Trim();
+            ltc.MaLop = txtMaLop.Text.Trim(); // ✅ ĐỔI TỪ tbMaLop
             ltc.MaMH = cbbMaMon.SelectedValue?.ToString();
-            ltc.HocKy = (int)numericUpDownHocky.Value;
+            ltc.HocKy = (int)numHocKy.Value; // ✅ ĐỔI TỪ numericUpDownHocky
 
             int namHoc;
-            if (int.TryParse(tbNamHoc.Text, out namHoc))
+            if (int.TryParse(txtNamHoc.Text, out namHoc)) // ✅ ĐỔI TỪ tbNamHoc
             {
                 ltc.NamHoc = namHoc;
             }
@@ -325,23 +315,20 @@ namespace BTL_LTTQ
                 ltc.NamHoc = null;
             }
 
-            // ĐÃ SỬA: Xóa 'cbbTinhTrang'.
-            // TinhTrangLop sẽ mặc định là false (0) khi tạo mới DTO
             ltc.TinhTrangLop = false;
-
             return ltc;
         }
 
         #endregion
 
-        #region Sự kiện CRUD (Gọi BLL)
+        #region CRUD Events
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbMaLop.Text))
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text))
             {
                 MessageBox.Show("Mã lớp không được để trống.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                tbMaLop.Focus();
+                txtMaLop.Focus();
                 return;
             }
             if (cbbMaMon.SelectedValue == null)
@@ -350,17 +337,17 @@ namespace BTL_LTTQ
                 cbbMaMon.Focus();
                 return;
             }
-            if (string.IsNullOrWhiteSpace(tbNamHoc.Text))
+            if (string.IsNullOrWhiteSpace(txtNamHoc.Text))
             {
                 MessageBox.Show("Năm học không được để trống.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                tbNamHoc.Focus();
+                txtNamHoc.Focus();
                 return;
             }
             int namHoc;
-            if (!int.TryParse(tbNamHoc.Text, out namHoc))
+            if (!int.TryParse(txtNamHoc.Text, out namHoc))
             {
                 MessageBox.Show("Năm học phải là một con số.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                tbNamHoc.Focus();
+                txtNamHoc.Focus();
                 return;
             }
 
@@ -398,7 +385,7 @@ namespace BTL_LTTQ
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbMaLop.Text) || tbMaLop.ReadOnly == false)
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || txtMaLop.ReadOnly == false)
             {
                 MessageBox.Show("Vui lòng chọn một lớp tín chỉ từ danh sách để sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -427,14 +414,14 @@ namespace BTL_LTTQ
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbMaLop.Text) || tbMaLop.ReadOnly == false)
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || txtMaLop.ReadOnly == false)
             {
                 MessageBox.Show("Vui lòng chọn một lớp từ danh sách để xóa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             DialogResult confirm = MessageBox.Show(
-                $"Bạn có chắc chắn muốn xóa Lớp Tín Chỉ (Mã: {tbMaLop.Text}) không?" +
+                $"Bạn có chắc chắn muốn xóa Lớp Tín Chỉ (Mã: {txtMaLop.Text}) không?" +
                 $"\n\nCẢNH BÁO: Toàn bộ dữ liệu Phân công giảng dạy và Điểm số của sinh viên liên quan đến lớp này cũng sẽ bị xóa vĩnh viễn.",
                 "Xác nhận xóa",
                 MessageBoxButtons.YesNo,
@@ -444,7 +431,7 @@ namespace BTL_LTTQ
             {
                 try
                 {
-                    if (bll.XoaLTC(tbMaLop.Text))
+                    if (bll.XoaLTC(txtMaLop.Text))
                     {
                         MessageBox.Show("Xóa lớp tín chỉ và các dữ liệu liên quan thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadDataGridView();
@@ -462,30 +449,30 @@ namespace BTL_LTTQ
             }
         }
 
-        private void btnRefresh_Click(object sender, EventArgs e)
+        private void btnLamMoi_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnRefresh_Click
         {
             ClearFields();
             LoadDataGridView();
 
-            tbTimKiemTheoTen.Text = placeholderMaLop;
-            tbTimKiemTheoTen.ForeColor = Color.Gray;
-            tbTimTheoNam.Text = "";
+            txtTimKiemTheoTen.Text = placeholderMaLop;
+            txtTimKiemTheoTen.ForeColor = Color.Gray;
+            txtTimTheoNam.Text = "";
             cbbTimTheoKhoa.SelectedIndex = 0;
         }
 
         #endregion
 
-        #region Sự kiện Tìm kiếm (Gọi BLL)
+        #region Search Events
 
-        private void btnTimKiem_Click(object sender, EventArgs e)
+        private void btnSearch_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnTimKiem_Click
         {
-            string tuKhoa = (tbTimKiemTheoTen.Text == placeholderMaLop) ? "" : tbTimKiemTheoTen.Text;
-            string namHocTim = tbTimTheoNam.Text;
+            string tuKhoa = (txtTimKiemTheoTen.Text == placeholderMaLop) ? "" : txtTimKiemTheoTen.Text;
+            string namHocTim = txtTimTheoNam.Text;
             string maKhoaTim = cbbTimTheoKhoa.SelectedValue?.ToString();
 
             try
             {
-                DataTable dt = bll.TimKiemLTC(tuKhoa, namHocTim, maKhoaTim); // Gọi BLL
+                DataTable dt = bll.TimKiemLTC(tuKhoa, namHocTim, maKhoaTim);
                 dgvSV.DataSource = dt;
 
                 if (dt.Rows.Count == 0)
@@ -503,11 +490,11 @@ namespace BTL_LTTQ
             }
         }
 
-        private void btnTatCa_Click(object sender, EventArgs e)
+        private void btnRefreshSearch_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnTatCa_Click
         {
-            tbTimKiemTheoTen.Text = placeholderMaLop;
-            tbTimKiemTheoTen.ForeColor = Color.Gray;
-            tbTimTheoNam.Text = "";
+            txtTimKiemTheoTen.Text = placeholderMaLop;
+            txtTimKiemTheoTen.ForeColor = Color.Gray;
+            txtTimTheoNam.Text = "";
             cbbTimTheoKhoa.SelectedIndex = 0;
 
             LoadDataGridView();
@@ -515,18 +502,15 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region Sự kiện Giao diện
+        #region UI Events
 
-        /// <summary>
-        /// Sửa lỗi FormatException: Dịch BIT (0/1) sang text "0: Chưa..." / "1: Đã..."
-        /// </summary>
         private void dgvSV_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (dgvSV.Columns[e.ColumnIndex].Name == "TinhTrangLop")
             {
                 if (e.Value == null || e.Value == DBNull.Value)
                 {
-                    e.Value = "0: Chưa phân công";
+                    e.Value = "Chưa phân công";
                     e.FormattingApplied = true;
                     return;
                 }
@@ -538,18 +522,12 @@ namespace BTL_LTTQ
                 else if (e.Value is byte || e.Value is int)
                     isAssigned = Convert.ToInt32(e.Value) == 1;
                 else
-                {
-                    // Đề phòng trường hợp dữ liệu không chuẩn → bỏ qua
                     return;
-                }
 
                 e.Value = isAssigned ? "Đã phân công" : "Chưa phân công";
                 e.FormattingApplied = true;
             }
         }
-
-
-
 
         private void dgvSV_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -557,16 +535,16 @@ namespace BTL_LTTQ
             {
                 DataGridViewRow row = dgvSV.Rows[e.RowIndex];
 
-                tbMaLop.Text = row.Cells["MaLop"].Value?.ToString();
-                tbNamHoc.Text = row.Cells["NamHoc"].Value?.ToString();
+                txtMaLop.Text = row.Cells["MaLop"].Value?.ToString();
+                txtNamHoc.Text = row.Cells["NamHoc"].Value?.ToString();
 
                 if (row.Cells["HocKy"].Value != null && row.Cells["HocKy"].Value != DBNull.Value)
                 {
-                    numericUpDownHocky.Value = Convert.ToDecimal(row.Cells["HocKy"].Value);
+                    numHocKy.Value = Convert.ToDecimal(row.Cells["HocKy"].Value);
                 }
                 else
                 {
-                    numericUpDownHocky.Value = 1;
+                    numHocKy.Value = 1;
                 }
 
                 string maKhoa = row.Cells["MaKhoa"].Value?.ToString();
@@ -589,10 +567,7 @@ namespace BTL_LTTQ
                     cbbMaMon.SelectedIndex = -1;
                 }
 
-                // ĐÃ SỬA: Xóa logic gán cho Tình Trạng
-                // vì control không còn trên form
-                tbMaLop.ReadOnly = true;
-
+                txtMaLop.ReadOnly = true;
             }
         }
 
@@ -609,42 +584,30 @@ namespace BTL_LTTQ
             }
         }
 
-        // --- Placeholder ---
         private void SetPlaceholderText()
         {
-            tbTimKiemTheoTen.Text = placeholderMaLop;
-            tbTimKiemTheoTen.ForeColor = Color.Gray;
+            txtTimKiemTheoTen.Text = placeholderMaLop;
+            txtTimKiemTheoTen.ForeColor = Color.Gray;
         }
 
-        private void tbTimKiemTheoTen_Enter(object sender, EventArgs e)
+        private void txtTimKiemTheoTen_Enter(object sender, EventArgs e)
         {
-            if (tbTimKiemTheoTen.Text == placeholderMaLop)
+            if (txtTimKiemTheoTen.Text == placeholderMaLop)
             {
-                tbTimKiemTheoTen.Text = "";
-                tbTimKiemTheoTen.ForeColor = Color.Black;
+                txtTimKiemTheoTen.Text = "";
+                txtTimKiemTheoTen.ForeColor = Color.Black;
             }
         }
 
-        private void tbTimKiemTheoTen_Leave(object sender, EventArgs e)
+        private void txtTimKiemTheoTen_Leave(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbTimKiemTheoTen.Text))
+            if (string.IsNullOrWhiteSpace(txtTimKiemTheoTen.Text))
             {
-                tbTimKiemTheoTen.Text = placeholderMaLop;
-                tbTimKiemTheoTen.ForeColor = Color.Gray;
+                txtTimKiemTheoTen.Text = placeholderMaLop;
+                txtTimKiemTheoTen.ForeColor = Color.Gray;
             }
         }
 
         #endregion
-
-        // Hàm này bạn có trong code gốc, tôi giữ lại
-        private void tbMaLop_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dgvSV_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
     }
 }

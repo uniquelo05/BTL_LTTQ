@@ -2,15 +2,8 @@
 {
     partial class formLichGiangDay
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,14 +15,27 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.statusStripBottom = new System.Windows.Forms.StatusStrip();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.pnlFilter = new System.Windows.Forms.Panel();
+            this.btnXuatExcel = new System.Windows.Forms.Button();
+            this.btnLamMoi = new System.Windows.Forms.Button();
+            this.btnTimKiem = new System.Windows.Forms.Button();
+            this.cboTuan = new System.Windows.Forms.ComboBox();
+            this.lblTuan = new System.Windows.Forms.Label();
+            this.cboHocKy = new System.Windows.Forms.ComboBox();
+            this.lblHocKy = new System.Windows.Forms.Label();
+            this.cboNamHoc = new System.Windows.Forms.ComboBox();
+            this.lblNamHoc = new System.Windows.Forms.Label();
+            this.txtMaGV = new System.Windows.Forms.TextBox();
+            this.lblMaGV = new System.Windows.Forms.Label();
+            this.lblFilterTitle = new System.Windows.Forms.Label();
+            this.pnlData = new System.Windows.Forms.Panel();
             this.dgvSchedule = new System.Windows.Forms.DataGridView();
             this.colCa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGio = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -40,37 +46,229 @@
             this.colThuSau = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colThuBay = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colChuNhat = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panelTop = new System.Windows.Forms.Panel();
-            this.groupBoxActions = new System.Windows.Forms.GroupBox();
-            this.btnChangeSlot = new System.Windows.Forms.Button();
-            this.btnExportSchedule = new System.Windows.Forms.Button();
-            this.btnSearch = new System.Windows.Forms.Button();
-            this.btnXem = new System.Windows.Forms.Button();
-            this.groupBoxFilter = new System.Windows.Forms.GroupBox();
-            this.txtMaGV = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cboTuan = new System.Windows.Forms.ComboBox();
-            this.labelHe1 = new System.Windows.Forms.Label();
-            this.cboHocKy = new System.Windows.Forms.ComboBox();
-            this.labelHocKy1 = new System.Windows.Forms.Label();
-            this.cboNamHoc = new System.Windows.Forms.ComboBox();
-            this.labelNamHoc = new System.Windows.Forms.Label();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.pnlHeader.SuspendLayout();
+            this.pnlFilter.SuspendLayout();
+            this.pnlData.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
-            this.panelTop.SuspendLayout();
-            this.groupBoxActions.SuspendLayout();
-            this.groupBoxFilter.SuspendLayout();
             this.SuspendLayout();
             // 
-            // statusStripBottom
+            // pnlHeader
             // 
-            this.statusStripBottom.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStripBottom.Location = new System.Drawing.Point(15, 604);
-            this.statusStripBottom.Name = "statusStripBottom";
-            this.statusStripBottom.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStripBottom.Size = new System.Drawing.Size(1049, 22);
-            this.statusStripBottom.TabIndex = 1;
-            this.statusStripBottom.Text = "statusStrip1";
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(236)))), ((int)(((byte)(238)))));
+            this.pnlHeader.Controls.Add(this.lblTitle);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Margin = new System.Windows.Forms.Padding(4);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(1300, 60);
+            this.pnlHeader.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblTitle.Location = new System.Drawing.Point(15, 12);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(339, 41);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "📅 LỊCH GIẢNG DẠY";
+            // 
+            // pnlFilter
+            // 
+            this.pnlFilter.BackColor = System.Drawing.Color.White;
+            this.pnlFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlFilter.Controls.Add(this.btnXuatExcel);
+            this.pnlFilter.Controls.Add(this.btnLamMoi);
+            this.pnlFilter.Controls.Add(this.btnTimKiem);
+            this.pnlFilter.Controls.Add(this.cboTuan);
+            this.pnlFilter.Controls.Add(this.lblTuan);
+            this.pnlFilter.Controls.Add(this.cboHocKy);
+            this.pnlFilter.Controls.Add(this.lblHocKy);
+            this.pnlFilter.Controls.Add(this.cboNamHoc);
+            this.pnlFilter.Controls.Add(this.lblNamHoc);
+            this.pnlFilter.Controls.Add(this.txtMaGV);
+            this.pnlFilter.Controls.Add(this.lblMaGV);
+            this.pnlFilter.Controls.Add(this.lblFilterTitle);
+            this.pnlFilter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlFilter.Location = new System.Drawing.Point(0, 60);
+            this.pnlFilter.Margin = new System.Windows.Forms.Padding(4);
+            this.pnlFilter.Name = "pnlFilter";
+            this.pnlFilter.Padding = new System.Windows.Forms.Padding(15, 8, 15, 8);
+            this.pnlFilter.Size = new System.Drawing.Size(1300, 100);
+            this.pnlFilter.TabIndex = 1;
+            // 
+            // btnXuatExcel
+            // 
+            this.btnXuatExcel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnXuatExcel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnXuatExcel.FlatAppearance.BorderSize = 0;
+            this.btnXuatExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnXuatExcel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnXuatExcel.ForeColor = System.Drawing.Color.White;
+            this.btnXuatExcel.Location = new System.Drawing.Point(1110, 47);
+            this.btnXuatExcel.Margin = new System.Windows.Forms.Padding(4);
+            this.btnXuatExcel.Name = "btnXuatExcel";
+            this.btnXuatExcel.Size = new System.Drawing.Size(150, 38);
+            this.btnXuatExcel.TabIndex = 11;
+            this.btnXuatExcel.Text = "📊 Xuất Excel";
+            this.btnXuatExcel.UseVisualStyleBackColor = false;
+            // 
+            // btnLamMoi
+            // 
+            this.btnLamMoi.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(125)))), ((int)(((byte)(139)))));
+            this.btnLamMoi.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnLamMoi.FlatAppearance.BorderSize = 0;
+            this.btnLamMoi.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLamMoi.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnLamMoi.ForeColor = System.Drawing.Color.White;
+            this.btnLamMoi.Location = new System.Drawing.Point(980, 47);
+            this.btnLamMoi.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLamMoi.Name = "btnLamMoi";
+            this.btnLamMoi.Size = new System.Drawing.Size(110, 38);
+            this.btnLamMoi.TabIndex = 10;
+            this.btnLamMoi.Text = "🔄 Làm mới";
+            this.btnLamMoi.UseVisualStyleBackColor = false;
+            // 
+            // btnTimKiem
+            // 
+            this.btnTimKiem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(136)))));
+            this.btnTimKiem.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTimKiem.FlatAppearance.BorderSize = 0;
+            this.btnTimKiem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTimKiem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnTimKiem.ForeColor = System.Drawing.Color.White;
+            this.btnTimKiem.Location = new System.Drawing.Point(850, 47);
+            this.btnTimKiem.Margin = new System.Windows.Forms.Padding(4);
+            this.btnTimKiem.Name = "btnTimKiem";
+            this.btnTimKiem.Size = new System.Drawing.Size(110, 38);
+            this.btnTimKiem.TabIndex = 9;
+            this.btnTimKiem.Text = "👁 Xem lịch";
+            this.btnTimKiem.UseVisualStyleBackColor = false;
+            // 
+            // cboTuan
+            // 
+            this.cboTuan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboTuan.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboTuan.FormattingEnabled = true;
+            this.cboTuan.Location = new System.Drawing.Point(765, 52);
+            this.cboTuan.Margin = new System.Windows.Forms.Padding(4);
+            this.cboTuan.Name = "cboTuan";
+            this.cboTuan.Size = new System.Drawing.Size(75, 31);
+            this.cboTuan.TabIndex = 8;
+            // 
+            // lblTuan
+            // 
+            this.lblTuan.AutoSize = true;
+            this.lblTuan.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblTuan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblTuan.Location = new System.Drawing.Point(710, 55);
+            this.lblTuan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblTuan.Name = "lblTuan";
+            this.lblTuan.Size = new System.Drawing.Size(52, 23);
+            this.lblTuan.TabIndex = 7;
+            this.lblTuan.Text = "Tuần:";
+            // 
+            // cboHocKy
+            // 
+            this.cboHocKy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboHocKy.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboHocKy.FormattingEnabled = true;
+            this.cboHocKy.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3"});
+            this.cboHocKy.Location = new System.Drawing.Point(610, 52);
+            this.cboHocKy.Margin = new System.Windows.Forms.Padding(4);
+            this.cboHocKy.Name = "cboHocKy";
+            this.cboHocKy.Size = new System.Drawing.Size(90, 31);
+            this.cboHocKy.TabIndex = 6;
+            // 
+            // lblHocKy
+            // 
+            this.lblHocKy.AutoSize = true;
+            this.lblHocKy.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblHocKy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblHocKy.Location = new System.Drawing.Point(540, 55);
+            this.lblHocKy.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblHocKy.Name = "lblHocKy";
+            this.lblHocKy.Size = new System.Drawing.Size(67, 23);
+            this.lblHocKy.TabIndex = 5;
+            this.lblHocKy.Text = "Học kỳ:";
+            // 
+            // cboNamHoc
+            // 
+            this.cboNamHoc.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboNamHoc.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboNamHoc.FormattingEnabled = true;
+            this.cboNamHoc.Items.AddRange(new object[] {
+            "2022",
+            "2023",
+            "2024",
+            "2025"});
+            this.cboNamHoc.Location = new System.Drawing.Point(405, 52);
+            this.cboNamHoc.Margin = new System.Windows.Forms.Padding(4);
+            this.cboNamHoc.Name = "cboNamHoc";
+            this.cboNamHoc.Size = new System.Drawing.Size(120, 31);
+            this.cboNamHoc.TabIndex = 4;
+            // 
+            // lblNamHoc
+            // 
+            this.lblNamHoc.AutoSize = true;
+            this.lblNamHoc.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblNamHoc.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblNamHoc.Location = new System.Drawing.Point(315, 55);
+            this.lblNamHoc.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNamHoc.Name = "lblNamHoc";
+            this.lblNamHoc.Size = new System.Drawing.Size(87, 23);
+            this.lblNamHoc.TabIndex = 3;
+            this.lblNamHoc.Text = "Năm học:";
+            // 
+            // txtMaGV
+            // 
+            this.txtMaGV.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtMaGV.Location = new System.Drawing.Point(145, 52);
+            this.txtMaGV.Margin = new System.Windows.Forms.Padding(4);
+            this.txtMaGV.Name = "txtMaGV";
+            this.txtMaGV.Size = new System.Drawing.Size(150, 30);
+            this.txtMaGV.TabIndex = 2;
+            // 
+            // lblMaGV
+            // 
+            this.lblMaGV.AutoSize = true;
+            this.lblMaGV.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblMaGV.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblMaGV.Location = new System.Drawing.Point(70, 55);
+            this.lblMaGV.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblMaGV.Name = "lblMaGV";
+            this.lblMaGV.Size = new System.Drawing.Size(68, 23);
+            this.lblMaGV.TabIndex = 1;
+            this.lblMaGV.Text = "Mã GV:";
+            // 
+            // lblFilterTitle
+            // 
+            this.lblFilterTitle.AutoSize = true;
+            this.lblFilterTitle.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.lblFilterTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.lblFilterTitle.Location = new System.Drawing.Point(15, 12);
+            this.lblFilterTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblFilterTitle.Name = "lblFilterTitle";
+            this.lblFilterTitle.Size = new System.Drawing.Size(87, 25);
+            this.lblFilterTitle.TabIndex = 0;
+            this.lblFilterTitle.Text = "🔍 Bộ lọc";
+            // 
+            // pnlData
+            // 
+            this.pnlData.BackColor = System.Drawing.Color.White;
+            this.pnlData.Controls.Add(this.dgvSchedule);
+            this.pnlData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlData.Location = new System.Drawing.Point(0, 160);
+            this.pnlData.Margin = new System.Windows.Forms.Padding(4);
+            this.pnlData.Name = "pnlData";
+            this.pnlData.Padding = new System.Windows.Forms.Padding(15);
+            this.pnlData.Size = new System.Drawing.Size(1300, 540);
+            this.pnlData.TabIndex = 2;
             // 
             // dgvSchedule
             // 
@@ -79,8 +277,16 @@
             this.dgvSchedule.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvSchedule.BackgroundColor = System.Drawing.Color.White;
             this.dgvSchedule.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvSchedule.ColumnHeadersHeight = 35;
-            this.dgvSchedule.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dgvSchedule.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Single;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(136)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(136)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvSchedule.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvSchedule.ColumnHeadersHeight = 40;
             this.dgvSchedule.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colCa,
             this.colGio,
@@ -91,23 +297,41 @@
             this.colThuSau,
             this.colThuBay,
             this.colChuNhat});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(5);
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvSchedule.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvSchedule.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvSchedule.EnableHeadersVisualStyles = false;
             this.dgvSchedule.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.dgvSchedule.Location = new System.Drawing.Point(15, 140);
+            this.dgvSchedule.Location = new System.Drawing.Point(15, 15);
             this.dgvSchedule.Margin = new System.Windows.Forms.Padding(4);
+            this.dgvSchedule.MultiSelect = false;
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.ReadOnly = true;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvSchedule.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvSchedule.RowHeadersVisible = false;
             this.dgvSchedule.RowHeadersWidth = 51;
-            this.dgvSchedule.RowTemplate.Height = 30;
-            this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(1049, 464);
-            this.dgvSchedule.TabIndex = 2;
+            this.dgvSchedule.RowTemplate.Height = 70;
+            this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dgvSchedule.Size = new System.Drawing.Size(1270, 510);
+            this.dgvSchedule.TabIndex = 0;
             // 
             // colCa
             // 
-            this.colCa.FillWeight = 25F;
+            this.colCa.FillWeight = 40F;
             this.colCa.HeaderText = "Ca";
             this.colCa.MinimumWidth = 6;
             this.colCa.Name = "colCa";
@@ -115,8 +339,8 @@
             // 
             // colGio
             // 
-            this.colGio.FillWeight = 45F;
-            this.colGio.HeaderText = "Giờ";
+            this.colGio.FillWeight = 70F;
+            this.colGio.HeaderText = "Giờ học";
             this.colGio.MinimumWidth = 6;
             this.colGio.Name = "colGio";
             this.colGio.ReadOnly = true;
@@ -170,266 +394,47 @@
             this.colChuNhat.Name = "colChuNhat";
             this.colChuNhat.ReadOnly = true;
             // 
-            // panelTop
-            // 
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(248)))));
-            this.panelTop.Controls.Add(this.groupBoxActions);
-            this.panelTop.Controls.Add(this.groupBoxFilter);
-            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTop.Location = new System.Drawing.Point(15, 15);
-            this.panelTop.Margin = new System.Windows.Forms.Padding(4);
-            this.panelTop.Name = "panelTop";
-            this.panelTop.Padding = new System.Windows.Forms.Padding(10);
-            this.panelTop.Size = new System.Drawing.Size(1049, 125);
-            this.panelTop.TabIndex = 3;
-            // 
-            // groupBoxActions
-            // 
-            this.groupBoxActions.Controls.Add(this.btnChangeSlot);
-            this.groupBoxActions.Controls.Add(this.btnExportSchedule);
-            this.groupBoxActions.Controls.Add(this.btnSearch);
-            this.groupBoxActions.Controls.Add(this.btnXem);
-            this.groupBoxActions.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBoxActions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBoxActions.Location = new System.Drawing.Point(599, 10);
-            this.groupBoxActions.Name = "groupBoxActions";
-            this.groupBoxActions.Padding = new System.Windows.Forms.Padding(10);
-            this.groupBoxActions.Size = new System.Drawing.Size(440, 105);
-            this.groupBoxActions.TabIndex = 1;
-            this.groupBoxActions.TabStop = false;
-            this.groupBoxActions.Text = "Thao tác";
-            // 
-            // btnChangeSlot
-            // 
-            this.btnChangeSlot.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(193)))), ((int)(((byte)(7)))));
-            this.btnChangeSlot.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnChangeSlot.FlatAppearance.BorderSize = 0;
-            this.btnChangeSlot.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnChangeSlot.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnChangeSlot.ForeColor = System.Drawing.Color.White;
-            this.btnChangeSlot.Location = new System.Drawing.Point(227, 60);
-            this.btnChangeSlot.Margin = new System.Windows.Forms.Padding(4);
-            this.btnChangeSlot.Name = "btnChangeSlot";
-            this.btnChangeSlot.Size = new System.Drawing.Size(200, 35);
-            this.btnChangeSlot.TabIndex = 12;
-            this.btnChangeSlot.Text = "Đổi Ca Dạy";
-            this.btnChangeSlot.UseVisualStyleBackColor = false;
-            // 
-            // btnExportSchedule
-            // 
-            this.btnExportSchedule.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
-            this.btnExportSchedule.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnExportSchedule.FlatAppearance.BorderSize = 0;
-            this.btnExportSchedule.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExportSchedule.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExportSchedule.ForeColor = System.Drawing.Color.White;
-            this.btnExportSchedule.Location = new System.Drawing.Point(13, 60);
-            this.btnExportSchedule.Margin = new System.Windows.Forms.Padding(4);
-            this.btnExportSchedule.Name = "btnExportSchedule";
-            this.btnExportSchedule.Size = new System.Drawing.Size(200, 35);
-            this.btnExportSchedule.TabIndex = 11;
-            this.btnExportSchedule.Text = "📊 Xuất Excel";
-            this.btnExportSchedule.UseVisualStyleBackColor = false;
-           // this.btnExportSchedule.Click += new System.EventHandler(this.btnExportSchedule_Click);
-            // 
-            // btnSearch
-            // 
-            this.btnSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(108)))), ((int)(((byte)(117)))), ((int)(((byte)(125)))));
-            this.btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSearch.FlatAppearance.BorderSize = 0;
-            this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSearch.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSearch.ForeColor = System.Drawing.Color.White;
-            this.btnSearch.Location = new System.Drawing.Point(227, 20);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(4);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(200, 35);
-            this.btnSearch.TabIndex = 10;
-            this.btnSearch.Text = "🔍 Tìm Kiếm";
-            this.btnSearch.UseVisualStyleBackColor = false;
-            // 
-            // btnXem
-            // 
-            this.btnXem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(123)))), ((int)(((byte)(255)))));
-            this.btnXem.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnXem.FlatAppearance.BorderSize = 0;
-            this.btnXem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnXem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnXem.ForeColor = System.Drawing.Color.White;
-            this.btnXem.Location = new System.Drawing.Point(13, 20);
-            this.btnXem.Margin = new System.Windows.Forms.Padding(4);
-            this.btnXem.Name = "btnXem";
-            this.btnXem.Size = new System.Drawing.Size(200, 35);
-            this.btnXem.TabIndex = 13;
-            this.btnXem.Text = "👁 Xem Lịch";
-            this.btnXem.UseVisualStyleBackColor = false;
-            this.btnXem.Click += new System.EventHandler(this.btnXem_Click);
-            // 
-            // groupBoxFilter
-            // 
-            this.groupBoxFilter.Controls.Add(this.txtMaGV);
-            this.groupBoxFilter.Controls.Add(this.label1);
-            this.groupBoxFilter.Controls.Add(this.cboTuan);
-            this.groupBoxFilter.Controls.Add(this.labelHe1);
-            this.groupBoxFilter.Controls.Add(this.cboHocKy);
-            this.groupBoxFilter.Controls.Add(this.labelHocKy1);
-            this.groupBoxFilter.Controls.Add(this.cboNamHoc);
-            this.groupBoxFilter.Controls.Add(this.labelNamHoc);
-            this.groupBoxFilter.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBoxFilter.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBoxFilter.Location = new System.Drawing.Point(10, 10);
-            this.groupBoxFilter.Name = "groupBoxFilter";
-            this.groupBoxFilter.Padding = new System.Windows.Forms.Padding(10);
-            this.groupBoxFilter.Size = new System.Drawing.Size(580, 105);
-            this.groupBoxFilter.TabIndex = 0;
-            this.groupBoxFilter.TabStop = false;
-            this.groupBoxFilter.Text = "Bộ lọc";
-            // 
-            // txtMaGV
-            // 
-            this.txtMaGV.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtMaGV.Location = new System.Drawing.Point(405, 28);
-            this.txtMaGV.Name = "txtMaGV";
-            this.txtMaGV.Size = new System.Drawing.Size(160, 27);
-            this.txtMaGV.TabIndex = 15;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(335, 31);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 20);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "Mã GV";
-            // 
-            // cboTuan
-            // 
-            this.cboTuan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboTuan.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cboTuan.FormattingEnabled = true;
-            this.cboTuan.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16",
-            "17"});
-            this.cboTuan.Location = new System.Drawing.Point(405, 64);
-            this.cboTuan.Margin = new System.Windows.Forms.Padding(4);
-            this.cboTuan.Name = "cboTuan";
-            this.cboTuan.Size = new System.Drawing.Size(160, 28);
-            this.cboTuan.TabIndex = 3;
-            // 
-            // labelHe1
-            // 
-            this.labelHe1.AutoSize = true;
-            this.labelHe1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHe1.Location = new System.Drawing.Point(346, 67);
-            this.labelHe1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelHe1.Name = "labelHe1";
-            this.labelHe1.Size = new System.Drawing.Size(41, 20);
-            this.labelHe1.TabIndex = 2;
-            this.labelHe1.Text = "Tuần";
-            // 
-            // cboHocKy
-            // 
-            this.cboHocKy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboHocKy.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cboHocKy.FormattingEnabled = true;
-            this.cboHocKy.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3"});
-            this.cboHocKy.Location = new System.Drawing.Point(103, 64);
-            this.cboHocKy.Margin = new System.Windows.Forms.Padding(4);
-            this.cboHocKy.Name = "cboHocKy";
-            this.cboHocKy.Size = new System.Drawing.Size(200, 28);
-            this.cboHocKy.TabIndex = 1;
-            // 
-            // labelHocKy1
-            // 
-            this.labelHocKy1.AutoSize = true;
-            this.labelHocKy1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHocKy1.Location = new System.Drawing.Point(13, 67);
-            this.labelHocKy1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelHocKy1.Name = "labelHocKy1";
-            this.labelHocKy1.Size = new System.Drawing.Size(54, 20);
-            this.labelHocKy1.TabIndex = 0;
-            this.labelHocKy1.Text = "Học kỳ";
-            // 
-            // cboNamHoc
-            // 
-            this.cboNamHoc.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboNamHoc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cboNamHoc.FormattingEnabled = true;
-            this.cboNamHoc.Items.AddRange(new object[] {
-            "2022",
-            "2023",
-            "2024",
-            "2025"});
-            this.cboNamHoc.Location = new System.Drawing.Point(103, 28);
-            this.cboNamHoc.Margin = new System.Windows.Forms.Padding(4);
-            this.cboNamHoc.Name = "cboNamHoc";
-            this.cboNamHoc.Size = new System.Drawing.Size(200, 28);
-            this.cboNamHoc.TabIndex = 5;
-            // 
-            // labelNamHoc
-            // 
-            this.labelNamHoc.AutoSize = true;
-            this.labelNamHoc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelNamHoc.Location = new System.Drawing.Point(13, 31);
-            this.labelNamHoc.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelNamHoc.Name = "labelNamHoc";
-            this.labelNamHoc.Size = new System.Drawing.Size(69, 20);
-            this.labelNamHoc.TabIndex = 4;
-            this.labelNamHoc.Text = "Năm học";
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-            // 
             // formLichGiangDay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1079, 641);
-            this.Controls.Add(this.dgvSchedule);
-            this.Controls.Add(this.panelTop);
-            this.Controls.Add(this.statusStripBottom);
+            this.ClientSize = new System.Drawing.Size(1300, 700);
+            this.Controls.Add(this.pnlData);
+            this.Controls.Add(this.pnlFilter);
+            this.Controls.Add(this.pnlHeader);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(1300, 700);
             this.Name = "formLichGiangDay";
-            this.Padding = new System.Windows.Forms.Padding(15);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "LỊCH GIẢNG DẠY CỦA TÔI";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.formLichGiangDay_Load);
+            this.Text = "Lịch Giảng Dạy";
+            this.pnlHeader.ResumeLayout(false);
+            this.pnlHeader.PerformLayout();
+            this.pnlFilter.ResumeLayout(false);
+            this.pnlFilter.PerformLayout();
+            this.pnlData.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
-            this.panelTop.ResumeLayout(false);
-            this.groupBoxActions.ResumeLayout(false);
-            this.groupBoxFilter.ResumeLayout(false);
-            this.groupBoxFilter.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
-
         }
 
         #endregion
-        private System.Windows.Forms.StatusStrip statusStripBottom;
+
+        private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.Panel pnlFilter;
+        private System.Windows.Forms.Label lblFilterTitle;
+        private System.Windows.Forms.Label lblMaGV;
+        private System.Windows.Forms.TextBox txtMaGV;
+        private System.Windows.Forms.Label lblNamHoc;
+        private System.Windows.Forms.ComboBox cboNamHoc;
+        private System.Windows.Forms.Label lblHocKy;
+        private System.Windows.Forms.ComboBox cboHocKy;
+        private System.Windows.Forms.Label lblTuan;
+        private System.Windows.Forms.ComboBox cboTuan;
+        private System.Windows.Forms.Button btnTimKiem;
+        private System.Windows.Forms.Button btnLamMoi;
+        private System.Windows.Forms.Button btnXuatExcel;
+        private System.Windows.Forms.Panel pnlData;
         private System.Windows.Forms.DataGridView dgvSchedule;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCa;
         private System.Windows.Forms.DataGridViewTextBoxColumn colGio;
@@ -440,21 +445,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colThuSau;
         private System.Windows.Forms.DataGridViewTextBoxColumn colThuBay;
         private System.Windows.Forms.DataGridViewTextBoxColumn colChuNhat;
-        private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.ComboBox cboNamHoc;
-        private System.Windows.Forms.Label labelNamHoc;
-        private System.Windows.Forms.ComboBox cboTuan;
-        private System.Windows.Forms.Label labelHe1;
-        private System.Windows.Forms.ComboBox cboHocKy;
-        private System.Windows.Forms.Label labelHocKy1;
-        private System.Windows.Forms.Button btnXem;
-        private System.Windows.Forms.Button btnChangeSlot;
-        private System.Windows.Forms.Button btnExportSchedule;
-        private System.Windows.Forms.Button btnSearch;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtMaGV;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.GroupBox groupBoxFilter;
-        private System.Windows.Forms.GroupBox groupBoxActions;
     }
 }

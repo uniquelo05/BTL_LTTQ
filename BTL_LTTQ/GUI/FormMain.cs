@@ -2,6 +2,7 @@
 using BTL_LTTQ.GUI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BTL_LTTQ
@@ -10,31 +11,125 @@ namespace BTL_LTTQ
     {
         // Dictionary để cache form con
         private readonly Dictionary<string, Form> _formCache = new Dictionary<string, Form>();
+        private Button _currentActiveButton = null;
 
         public FormMain()
         {
             InitializeComponent();
-
-            // Load form đầu tiên
-            LoadChildForm(typeof(formMonHoc));
-
-            // Gán sự kiện panel click
-            panelMonHoc.Click += (s, e) => LoadChildForm(typeof(formMonHoc));
-            panelGiangVien.Click += (s, e) => LoadChildForm(typeof(formGV));
-            panelPhanCongGiangVien.Click += (s, e) => LoadChildForm(typeof(formPhanCongGV));
-            paneLopTC.Click += (s, e) => LoadChildForm(typeof(formLopTC));
-            panelDiem.Click += (s, e) => LoadChildForm(typeof(formDiem));
-            panelSinhVien.Click += (s, e) => LoadChildForm(typeof(formSV));
-            panelSchedule.Click += (s, e) => LoadChildForm(typeof(formLichGiangDay));
-
-            // Hiển thị user đang đăng nhập
-            DisplayUserInfo();
-
-            // Kiểm tra quyền và ẩn các chức năng không phù hợp
-            ConfigureAccessByRole();
+            InitializeForm();
+            
+            // Quan trọng: Ngăn form đóng khi user click X
+            this.FormClosing += FormMain_FormClosing;
         }
 
-        // ------------------------- LOAD FORM -------------------------
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Nếu session đã bị clear (đang trong quá trình logout), cho phép đóng
+            if (!UserSession.IsLoggedIn)
+            {
+                return;
+            }
+
+            // Nếu user click X, hỏi xác nhận giống như Logout
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                DialogResult result = MessageBox.Show(
+                    "Bạn có chắc chắn muốn đăng xuất?",
+                    "Xác nhận đăng xuất",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    // Đăng xuất
+                    PerformLogout();
+                    e.Cancel = true; // Hủy việc đóng form
+                }
+                else
+                {
+                    // Không đăng xuất → Cancel việc đóng form
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private void InitializeForm()
+        {
+            // Hiển thị thông tin user
+            DisplayUserInfo();
+
+            // Cấu hình quyền truy cập
+            ConfigureAccessByRole();
+
+            // Thiết lập hover effects cho menu
+            SetupMenuHoverEffects();
+
+            // Load form mặc định
+            LoadChildForm(typeof(formMonHoc));
+            SetActiveButton(btnMonHoc);
+        }
+
+        #region Menu Hover Effects
+
+        private void SetupMenuHoverEffects()
+        {
+            List<Button> menuButtons = new List<Button>
+            {
+                btnGiangVien, btnDiem, btnPhanCong, btnLopTC,
+                btnMonHoc, btnSinhVien, btnLichGiangDay
+            };
+
+            foreach (Button btn in menuButtons)
+            {
+                // ✅ KHÔNG CẦN THÊM GÌ - MouseOverBackColor đã có sẵn trong Designer
+                // Chỉ cần handle Paint event để vẽ viền trái
+                btn.Paint += MenuButton_Paint;
+            }
+        }
+
+        private void MenuButton_Paint(object sender, PaintEventArgs e)
+        {
+            Button btn = sender as Button;
+            
+            // ✅ VẼ VIỀN TRÁI CHO BUTTON ACTIVE
+            if (btn == _currentActiveButton)
+            {
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(52, 152, 219)))
+                {
+                    e.Graphics.FillRectangle(brush, 0, 0, 4, btn.Height);
+                }
+            }
+        }
+
+        private void MenuButton_MouseEnter(object sender, EventArgs e)
+        {
+            Button btn = sender as Button;
+            
+            // Nếu không phải button đang active thì highlight
+            if (btn != _currentActiveButton)
+            {
+                btn.BackColor = Color.FromArgb(0, 121, 107); // Màu hover
+                btn.ForeColor = Color.White;
+            }
+        }
+
+        private void MenuButton_MouseLeave(object sender, EventArgs e)
+        {
+            Button btn = sender as Button;
+            
+            // Nếu không phải button đang active thì về transparent
+            if (btn != _currentActiveButton)
+            {
+                btn.BackColor = Color.Transparent;
+                btn.ForeColor = Color.White;
+            }
+        }
+
+        #endregion
+
+        #region Load Child Forms
+
         private void LoadChildForm(Type formType)
         {
             try
@@ -56,7 +151,7 @@ namespace BTL_LTTQ
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải form: " + ex.Message);
+                MessageBox.Show("Lỗi tải form: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -66,94 +161,156 @@ namespace BTL_LTTQ
             form.FormBorderStyle = FormBorderStyle.None;
             form.Dock = DockStyle.Fill;
 
-            panelMain.Controls.Clear();
-            panelMain.Controls.Add(form);
+            pnlMain.Controls.Clear();
+            pnlMain.Controls.Add(form);
 
             form.Show();
         }
 
-        // ----------------------- USER INFO --------------------------
+        #endregion
+
+        #region Menu Navigation Events
+
+        private void btnGiangVien_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formGV));
+            SetActiveButton(btnGiangVien);
+        }
+
+        private void btnDiem_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formDiem));
+            SetActiveButton(btnDiem);
+        }
+
+        private void btnPhanCong_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formPhanCongGV));
+            SetActiveButton(btnPhanCong);
+        }
+
+        private void btnLopTC_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formLopTC));
+            SetActiveButton(btnLopTC);
+        }
+
+        private void btnMonHoc_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formMonHoc));
+            SetActiveButton(btnMonHoc);
+        }
+
+        private void btnSinhVien_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formSV));
+            SetActiveButton(btnSinhVien);
+        }
+
+        private void btnLichGiangDay_Click(object sender, EventArgs e)
+        {
+            LoadChildForm(typeof(formLichGiangDay));
+            SetActiveButton(btnLichGiangDay);
+        }
+
+        #endregion
+
+        #region Window Control Events
+
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Xác nhận đăng xuất",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                PerformLogout();
+            }
+        }
+
+        private void PerformLogout()
+        {
+            // Xóa session
+            UserSession.ClearSession();
+            
+            // Xóa cache forms để giải phóng bộ nhớ
+            foreach (var form in _formCache.Values)
+            {
+                form.Dispose();
+            }
+            _formCache.Clear();
+            
+            // Ẩn FormMain (KHÔNG đóng)
+            this.Hide();
+
+            // Mở lại form Login
+            Login loginForm = new Login();
+            
+            loginForm.FormClosed += (s, args) =>
+            {
+                if (UserSession.IsLoggedIn)
+                {
+                    // Login thành công → Show lại FormMain
+                    InitializeForm();
+                    this.Show();
+                }
+                else
+                {
+                    // Đóng Login mà không đăng nhập → Thoát app
+                    Application.Exit();
+                }
+            };
+            
+            loginForm.Show();
+        }
+
+        #endregion
+
+        #region UI Helper Methods
+
+        private void SetActiveButton(Button activeButton)
+        {
+            // Reset button trước
+            if (_currentActiveButton != null)
+            {
+                _currentActiveButton.BackColor = Color.Transparent;
+                _currentActiveButton.Invalidate(); // Redraw
+            }
+
+            // Set active
+            activeButton.BackColor = Color.FromArgb(44, 62, 80);
+            _currentActiveButton = activeButton;
+            activeButton.Invalidate(); // Redraw để vẽ viền trái
+        }
+
         private void DisplayUserInfo()
         {
-            lblUserInfo.Text = UserSession.IsLoggedIn
-                ? UserSession.Instance.GetDisplayInfo()
-                : "Chưa đăng nhập";
+            if (UserSession.IsLoggedIn)
+            {
+                lblUserName.Text = UserSession.Instance.Username;
+                lblUserRole.Text = UserSession.Instance.IsAdmin() ? "Quản trị viên" : "Giảng viên";
+            }
+            else
+            {
+                lblUserName.Text = "Chưa đăng nhập";
+                lblUserRole.Text = "";
+            }
         }
 
-private void ConfigureAccessByRole()
-{
-    if (!UserSession.Instance.IsAdmin())
-    {
-        // 1. Ẩn các khối chức năng Admin
-        panelKhoi.Visible = false;  // Khối Giảng viên
-        panelKhoi3.Visible = false; // Khối Phân công
-
-        // 2. Lấy vị trí bắt đầu trám (lấy vị trí cũ của panelKhoi)
-        int currentY = panelKhoi.Location.Y; 
-
-        // 3. Dịch chuyển các panel lên trên
-        
-        // --- Dịch chuyển Lớp Tín Chỉ ---
-        panelKhoi4.Location = new System.Drawing.Point(panelKhoi4.Location.X, currentY);
-        currentY += panelKhoi4.Height;
-
-        // --- Dịch chuyển Môn Học ---
-        panelKhoi5.Location = new System.Drawing.Point(panelKhoi5.Location.X, currentY);
-        currentY += panelKhoi5.Height;
-
-        // --- Dịch chuyển Sinh Viên ---
-        panelKhoi6.Location = new System.Drawing.Point(panelKhoi6.Location.X, currentY);
-        currentY += panelKhoi6.Height;
-
-        // --- Dịch chuyển Lịch Trình (Schedule) - MỚI ---
-        panelKhoi7.Location = new System.Drawing.Point(panelKhoi7.Location.X, currentY);
-        currentY += panelKhoi7.Height;
-
-        // --- KHẮC PHỤC: Dịch chuyển chỉ trắng dưới cùng (panel4) ---
-        // panel4 phải nằm ngay dưới đáy của panelKhoi6
-        panel4.Location = new System.Drawing.Point(panel4.Location.X, currentY);
-    }
-    else
-    {
-        // Nếu là Admin: Hiện lại và Reset về vị trí gốc (theo Designer)
-        panelKhoi.Visible = true;
-        panelKhoi3.Visible = true;
-
-        panelKhoi.Location = new System.Drawing.Point(0, 135);
-        panelKhoi3.Location = new System.Drawing.Point(0, 197);
-        panelKhoi4.Location = new System.Drawing.Point(0, 249);
-        panelKhoi5.Location = new System.Drawing.Point(0, 299);
-        panelKhoi6.Location = new System.Drawing.Point(0, 350);
-        panelKhoi7.Location = new System.Drawing.Point(0, 401);
-        
-        // Reset lại vị trí chỉ trắng panel4
-        panel4.Location = new System.Drawing.Point(0, 452);
-    }
-}
-
-        private void panelSinhVien_Paint(object sender, PaintEventArgs e)
+        private void ConfigureAccessByRole()
         {
-
+            if (!UserSession.Instance.IsAdmin())
+            {
+                // Ẩn các menu chỉ dành cho Admin
+                btnGiangVien.Visible = false;
+                btnPhanCong.Visible = false;
+            }
         }
 
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblUserInfo_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
+        #endregion
     }
 }
