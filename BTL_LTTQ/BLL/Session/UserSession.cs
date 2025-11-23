@@ -25,6 +25,9 @@ namespace BTL_LTTQ.BLL.Session
         public string MaGV { get; private set; }
         public DateTime LoginTime { get; private set; }
 
+        // Alias cho TenDangNhap để tương thích
+        public string Username => TenDangNhap;
+
         private UserSession() { }
 
         public void Set(UserInfo user)
@@ -45,14 +48,21 @@ namespace BTL_LTTQ.BLL.Session
             LoginTime = DateTime.MinValue;
         }
 
+        // Static method để clear session
+        public static void ClearSession()
+        {
+            Instance.Clear();
+        }
+
         public static bool IsLoggedIn => Instance.TenDangNhap != null;
+        
         public bool IsAdmin() => LoaiTaiKhoan == "Admin";
+        
         public bool IsGiangVien() => LoaiTaiKhoan == "Giảng viên";
 
         public string GetDisplayInfo()
         {
             return $"Tên đăng nhập: {TenDangNhap}\nLoại tài khoản: {LoaiTaiKhoan}";
-            // return $"Tên đăng nhập: {TenDangNhap}, Loại tài khoản: {LoaiTaiKhoan}";
         }
 
         public static string GetDisplayInfoStatic()

@@ -8,18 +8,52 @@ namespace BTL_LTTQ.DAL.Diem
 {
     internal class DiemDAL
     {
-        // Lấy toàn bộ danh sách điểm
-        public DataTable GetAll()
+        // Lấy toàn bộ danh sách điểm theo MaGV
+        public DataTable GetAll(string maGV, string loaiTaiKhoan)
         {
             string query = @"SELECT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
                              FROM Diem d 
-                             JOIN SinhVien sv ON d.MaSV = sv.MaSV";
-            return DatabaseConnection.ExecuteQuery(query);
+                             JOIN SinhVien sv ON d.MaSV = sv.MaSV
+                             JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
+                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop";
+
+            if (loaiTaiKhoan != "Admin")
+            {
+                query += " WHERE pc.MaGV = @MaGV";
+            }
+
+            SqlParameter[] parameters = loaiTaiKhoan == "Admin" ? new SqlParameter[] { } : new SqlParameter[]
+            {
+                new SqlParameter("@MaGV", maGV)
+            };
+
+            return DatabaseConnection.ExecuteQuery(query, parameters);
         }
 
         // Thêm mới điểm
-        public bool Insert(Score diem)
+        public bool Insert(Score diem, string maGV, string loaiTaiKhoan)
         {
+            // Kiểm tra nếu không phải Admin thì phải xác nhận lớp thuộc về giảng viên
+            if (loaiTaiKhoan != "Admin")
+            {
+                string checkQuery = @"SELECT COUNT(*)
+                                      FROM LopTinChi ltc
+                                      JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                                      WHERE ltc.MaLop = @MaLop AND pc.MaGV = @MaGV";
+
+                SqlParameter[] checkParams = new SqlParameter[]
+                {
+                    new SqlParameter("@MaLop", diem.MaLop),
+                    new SqlParameter("@MaGV", maGV)
+                };
+
+                int count = (int)DatabaseConnection.ExecuteScalar(checkQuery, checkParams);
+                if (count == 0)
+                {
+                    return false; // Lớp không thuộc về giảng viên
+                }
+            }
+
             string query = @"
                 INSERT INTO Diem (MaLop, MaSV, DiemCC, DiemGK, DiemThi, DiemKTHP)
                 SELECT 
@@ -101,17 +135,30 @@ namespace BTL_LTTQ.DAL.Diem
             return count > 0;
         }
 
-        // Tìm kiếm theo mã lớp, mã SV (có thể kết hợp hoặc chỉ 1 trong 2)
-        public DataTable Search(string maLop, string maSV)
+        // Tìm kiếm theo mã lớp, mã SV và MaGV
+        public DataTable Search(string maLop, string maSV, string maGV, string loaiTaiKhoan)
         {
             string query = @"SELECT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
                              FROM Diem d
                              JOIN SinhVien sv ON d.MaSV = sv.MaSV
-                             WHERE ( @MaLop IS NULL OR @MaLop = '' OR d.MaLop = @MaLop )
-                               AND ( @MaSV IS NULL OR @MaSV = '' OR d.MaSV = @MaSV )";
+                             JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
+                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop";
 
-            SqlParameter[] parameters = new SqlParameter[]
+            if (loaiTaiKhoan != "Admin")
             {
+                query += " WHERE pc.MaGV = @MaGV";
+            }
+
+            query += @" AND ( @MaLop IS NULL OR @MaLop = '' OR d.MaLop = @MaLop )
+                        AND ( @MaSV IS NULL OR @MaSV = '' OR d.MaSV = @MaSV )";
+
+            SqlParameter[] parameters = loaiTaiKhoan == "Admin" ? new SqlParameter[]
+            {
+                new SqlParameter("@MaLop", string.IsNullOrWhiteSpace(maLop) ? (object)DBNull.Value : maLop),
+                new SqlParameter("@MaSV", string.IsNullOrWhiteSpace(maSV) ? (object)DBNull.Value : maSV)
+            } : new SqlParameter[]
+            {
+                new SqlParameter("@MaGV", maGV),
                 new SqlParameter("@MaLop", string.IsNullOrWhiteSpace(maLop) ? (object)DBNull.Value : maLop),
                 new SqlParameter("@MaSV", string.IsNullOrWhiteSpace(maSV) ? (object)DBNull.Value : maSV)
             };

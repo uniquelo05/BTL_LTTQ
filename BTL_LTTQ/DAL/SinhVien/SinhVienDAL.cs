@@ -10,7 +10,7 @@ namespace BTL_LTTQ.DAL
     public class SinhVienDAL
     {
         // ✅ SỬA: Hiển thị cả MaLop và TenLop (MaLop + TenMH)
-        public DataTable TimKiem(string maKhoa, string maLop, string maSV)
+        public DataTable TimKiem(string maKhoa, string maLop, string maSV, string maGV, string loaiTaiKhoan)
         {
             string query = @"
                 SELECT DISTINCT 
@@ -33,9 +33,16 @@ namespace BTL_LTTQ.DAL
                 LEFT JOIN Diem d ON sv.MaSV = d.MaSV
                 LEFT JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
                 LEFT JOIN MonHoc mh ON ltc.MaMH = mh.MaMH
+                LEFT JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
                 WHERE 1=1";
 
             var parameters = new List<SqlParameter>();
+
+            if (loaiTaiKhoan != "Admin")
+            {
+                query += " AND pc.MaGV = @MaGV";
+                parameters.Add(new SqlParameter("@MaGV", maGV));
+            }
 
             if (!string.IsNullOrEmpty(maKhoa))
             {
@@ -66,20 +73,7 @@ namespace BTL_LTTQ.DAL
         }
 
         // ✅ SỬA: Hiển thị "MaLop - TenMH"
-        public DataTable LayTatCaLopTinChi()
-        {
-            string query = @"
-                SELECT 
-                    ltc.MaLop,
-                    ltc.MaLop + N' - ' + mh.TenMH AS TenLop
-                FROM LopTinChi ltc
-                INNER JOIN MonHoc mh ON ltc.MaMH = mh.MaMH
-                ORDER BY ltc.MaLop";
-            return DatabaseConnection.ExecuteQuery(query);
-        }
-
-        // ✅ SỬA: Hiển thị "MaLop - TenMH"
-        public DataTable LayLopTinChiTheoKhoa(string maKhoa)
+        public DataTable LayTatCaLopTinChi(string maGV, string loaiTaiKhoan)
         {
             string query = @"
                 SELECT DISTINCT 
@@ -87,9 +81,45 @@ namespace BTL_LTTQ.DAL
                     ltc.MaLop + N' - ' + mh.TenMH AS TenLop
                 FROM LopTinChi ltc
                 INNER JOIN MonHoc mh ON ltc.MaMH = mh.MaMH
-                WHERE mh.MaKhoa = @MaKhoa
-                ORDER BY ltc.MaLop";
-            return DatabaseConnection.ExecuteQuery(query, new[] { new SqlParameter("@MaKhoa", maKhoa) });
+                LEFT JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                WHERE 1=1";
+
+            var parameters = new List<SqlParameter>();
+
+            if (loaiTaiKhoan != "Admin")
+            {
+                query += " AND pc.MaGV = @MaGV";
+                parameters.Add(new SqlParameter("@MaGV", maGV));
+            }
+
+            query += " ORDER BY ltc.MaLop";
+
+            return DatabaseConnection.ExecuteQuery(query, parameters.ToArray());
+        }
+
+        // ✅ SỬA: Hiển thị "MaLop - TenMH"
+        public DataTable LayLopTinChiTheoKhoa(string maKhoa, string maGV, string loaiTaiKhoan)
+        {
+            string query = @"
+                SELECT DISTINCT 
+                    ltc.MaLop,
+                    ltc.MaLop + N' - ' + mh.TenMH AS TenLop
+                FROM LopTinChi ltc
+                INNER JOIN MonHoc mh ON ltc.MaMH = mh.MaMH
+                LEFT JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                WHERE mh.MaKhoa = @MaKhoa";
+
+            var parameters = new List<SqlParameter> { new SqlParameter("@MaKhoa", maKhoa) };
+
+            if (loaiTaiKhoan != "Admin")
+            {
+                query += " AND pc.MaGV = @MaGV";
+                parameters.Add(new SqlParameter("@MaGV", maGV));
+            }
+
+            query += " ORDER BY ltc.MaLop";
+
+            return DatabaseConnection.ExecuteQuery(query, parameters.ToArray());
         }
 
         public bool Them(SinhVienDTO sv)

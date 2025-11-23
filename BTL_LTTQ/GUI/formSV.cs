@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BTL_LTTQ.BLL;
 using BTL_LTTQ.DTO;
+using BTL_LTTQ.BLL.Session;
 
 namespace BTL_LTTQ
 {
@@ -144,20 +145,16 @@ namespace BTL_LTTQ
         {
             try
             {
-                var dt = svBLL.LayTatCaLopTinChi();
-                DataRow empty = dt.NewRow();
-                empty["MaLop"] = DBNull.Value;
-                empty["TenLop"] = "-- Chọn lớp --";
-                dt.Rows.InsertAt(empty, 0);
-
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+                var dt = svBLL.LayTatCaLopTinChi(maGV, loaiTaiKhoan);
                 cmbTimTheoLop.DataSource = dt;
                 cmbTimTheoLop.DisplayMember = "TenLop";
                 cmbTimTheoLop.ValueMember = "MaLop";
-                cmbTimTheoLop.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi load lớp: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Lỗi load lớp tín chỉ: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -165,7 +162,9 @@ namespace BTL_LTTQ
         {
             try
             {
-                var dt = svBLL.TimKiem("", "", "");
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+                var dt = svBLL.TimKiem("", "", "", maGV, loaiTaiKhoan);
                 dgvSV.DataSource = dt;
             }
             catch (Exception ex)
@@ -196,8 +195,8 @@ namespace BTL_LTTQ
 
                     string maKhoa = cmbTimTheoKhoa.SelectedValue?.ToString() ?? "";
                     DataTable dtLop = string.IsNullOrEmpty(maKhoa) || maKhoa == "System.DBNull"
-                        ? svBLL.LayTatCaLopTinChi()
-                        : svBLL.LayLopTinChiTheoKhoa(maKhoa);
+                        ? svBLL.LayTatCaLopTinChi(UserSession.Instance.MaGV, UserSession.Instance.LoaiTaiKhoan)
+                        : svBLL.LayLopTinChiTheoKhoa(maKhoa, UserSession.Instance.MaGV, UserSession.Instance.LoaiTaiKhoan);
 
                     cmbMaLopTC.DataSource = dtLop;
                     cmbMaLopTC.DisplayMember = "TenLop";
@@ -239,7 +238,7 @@ namespace BTL_LTTQ
                 string maKhoa = cmbTimTheoKhoa.SelectedValue?.ToString() ?? "";
                 if (!string.IsNullOrEmpty(maKhoa) && maKhoa != "System.DBNull")
                 {
-                    var dtLop = svBLL.LayLopTinChiTheoKhoa(maKhoa);
+                    var dtLop = svBLL.LayLopTinChiTheoKhoa(maKhoa, UserSession.Instance.MaGV, UserSession.Instance.LoaiTaiKhoan);
                     DataRow empty = dtLop.NewRow();
                     empty["MaLop"] = DBNull.Value;
                     empty["TenLop"] = "-- Chọn lớp --";
@@ -271,44 +270,21 @@ namespace BTL_LTTQ
 
             try
             {
-                if (cmbTimTheoKhoa.SelectedIndex <= 0 || cmbTimTheoKhoa.SelectedValue == null)
+                string maKhoa = cmbTimTheoKhoa.SelectedValue?.ToString();
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+
+                if (!string.IsNullOrEmpty(maKhoa))
                 {
-                    isLoadingData = true;
-                    LoadTatCaLopTinChi();
-                    isLoadingData = false;
-                    TimKiemTuDong();
-                    return;
+                    var dt = svBLL.LayLopTinChiTheoKhoa(maKhoa, maGV, loaiTaiKhoan);
+                    cmbTimTheoLop.DataSource = dt;
+                    cmbTimTheoLop.DisplayMember = "TenLop";
+                    cmbTimTheoLop.ValueMember = "MaLop";
                 }
-
-                string maKhoa = cmbTimTheoKhoa.SelectedValue.ToString();
-                if (string.IsNullOrEmpty(maKhoa) || maKhoa == "System.DBNull")
-                {
-                    isLoadingData = true;
-                    LoadTatCaLopTinChi();
-                    isLoadingData = false;
-                    TimKiemTuDong();
-                    return;
-                }
-
-                isLoadingData = true;
-                var dtLop = svBLL.LayLopTinChiTheoKhoa(maKhoa);
-                DataRow empty = dtLop.NewRow();
-                empty["MaLop"] = DBNull.Value;
-                empty["TenLop"] = "-- Chọn lớp --";
-                dtLop.Rows.InsertAt(empty, 0);
-
-                cmbTimTheoLop.DataSource = dtLop;
-                cmbTimTheoLop.DisplayMember = "TenLop";
-                cmbTimTheoLop.ValueMember = "MaLop";
-                cmbTimTheoLop.SelectedIndex = 0;
-                isLoadingData = false;
-
-                TimKiemTuDong();
             }
             catch (Exception ex)
             {
-                isLoadingData = false;
-                MessageBox.Show($"Lỗi chọn khoa: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Lỗi lọc lớp tín chỉ theo khoa: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -357,7 +333,10 @@ namespace BTL_LTTQ
                 if (maSV == "Nhập mã sinh viên...")
                     maSV = "";
 
-                var dt = svBLL.TimKiem(maKhoa, maLop, maSV);
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+
+                var dt = svBLL.TimKiem(maKhoa, maLop, maSV, maGV, loaiTaiKhoan);
                 dgvSV.DataSource = dt;
             }
             catch (Exception ex)
@@ -368,7 +347,23 @@ namespace BTL_LTTQ
         #endregion
 
         #region NÚT TÌM & TẤT CẢ
-        private void btnTimKiem_Click(object sender, EventArgs e) => TimKiemTuDong();
+        private void btnTimKiem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string maKhoa = cmbTimTheoKhoa.SelectedValue?.ToString();
+                string maLop = cmbTimTheoLop.SelectedValue?.ToString();
+                string maSV = tbTimKiemTheoMa.Text.Trim();
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+
+                dgvSV.DataSource = svBLL.TimKiem(maKhoa, maLop, maSV, maGV, loaiTaiKhoan);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message);
+            }
+        }
 
         private void btnTatCa_Click(object sender, EventArgs e)
         {

@@ -12,13 +12,12 @@ namespace BTL_LTTQ.BLL.Diem
     {
         private DiemDAL dal = new DiemDAL();
 
-        public DataTable LayDanhSach()
+        public DataTable LayDanhSach(string maGV, string loaiTaiKhoan)
         {
-            return new DiemDAL().GetAll(); // tạo DAL mới để tránh giữ cache cũ
+            return dal.GetAll(maGV, loaiTaiKhoan);
         }
 
-
-        public string ThemDiem(Score diem)
+        public string ThemDiem(Score diem, string maGV, string loaiTaiKhoan)
         {
             // Bỏ kiem tra TenSV vi da xoa khoi DTO
             if (string.IsNullOrWhiteSpace(diem.MaSV) ||
@@ -35,7 +34,14 @@ namespace BTL_LTTQ.BLL.Diem
             if (dal.CheckExist(diem.MaLop, diem.MaSV))
                 return "Sinh viên này đã có điểm trong lớp này!";
 
-            return dal.Insert(diem) ? "Thêm thành công!" : "Thêm thất bại!";
+            // Gọi DAL để thêm điểm, kiểm tra quyền của giảng viên
+            bool result = dal.Insert(diem, maGV, loaiTaiKhoan);
+            if (!result)
+            {
+                return "Bạn không có quyền thêm điểm vào lớp này!";
+            }
+
+            return "Thêm thành công!";
         }
 
         public string SuaDiem(Score diem)
@@ -66,9 +72,9 @@ namespace BTL_LTTQ.BLL.Diem
             return dal.Delete(MaSV, MaLop) ? "Xóa thành công!" : "Xóa thất bại!";
         }
         //tìm kiếm theo mã lớp tc/ mã sv  
-        public DataTable TimKiem(string maLop, string maSV)
+        public DataTable TimKiem(string maLop, string maSV, string maGV, string loaiTaiKhoan)
         {
-            return dal.Search(maLop, maSV);
+            return dal.Search(maLop, maSV, maGV, loaiTaiKhoan);
         }
 
     }
