@@ -193,7 +193,7 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region 4. Logic Tìm kiếm Tự động (Giống formSV)
+        #region 4. Logic Tìm kiếm Tự động
 
         private void TimKiemTuDong()
         {
@@ -233,7 +233,7 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region 5. Xử lý Logic & Validate (Regex)
+        #region 5. Xử lý Logic & Validate (Theo yêu cầu mới)
 
         private void ClearFields()
         {
@@ -281,7 +281,7 @@ namespace BTL_LTTQ
 
         private bool ValidateInput()
         {
-            // 1. Kiểm tra Mã GV
+            // 1. Kiểm tra Mã GV (BẮT BUỘC)
             if (string.IsNullOrWhiteSpace(txtMaGV.Text))
             {
                 MessageBox.Show("Vui lòng nhập Mã giảng viên!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -289,7 +289,7 @@ namespace BTL_LTTQ
                 return false;
             }
 
-            // 2. Kiểm tra Họ tên
+            // 2. Kiểm tra Họ tên (BẮT BUỘC)
             if (string.IsNullOrWhiteSpace(txtHoTen.Text))
             {
                 MessageBox.Show("Vui lòng nhập Họ tên giảng viên!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -297,16 +297,15 @@ namespace BTL_LTTQ
                 return false;
             }
 
-            // 3. Kiểm tra Khoa (MỚI THÊM)
-            // Kiểm tra nếu chưa chọn gì (SelectedIndex = -1) hoặc giá trị null
-            if (cbbKhoa.SelectedIndex == -1 || cbbKhoa.SelectedValue == null)
+            // 3. Kiểm tra Khoa (BẮT BUỘC)
+            if (cbbMaKhoa.SelectedIndex == -1 || cbbMaKhoa.SelectedValue == null)
             {
                 MessageBox.Show("Vui lòng chọn Khoa công tác!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cbbKhoa.Focus(); // Đưa con trỏ về ô Khoa
+                cbbMaKhoa.Focus();
                 return false;
             }
 
-            // 4. Kiểm tra Ngày sinh
+            // 4. Kiểm tra Ngày sinh (BẮT BUỘC & ĐÚNG ĐỊNH DẠNG)
             if (txtNgaySinh.Text == placeholderNgaySinh || string.IsNullOrWhiteSpace(txtNgaySinh.Text))
             {
                 MessageBox.Show("Vui lòng nhập Ngày sinh!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -327,43 +326,32 @@ namespace BTL_LTTQ
                 return false;
             }
 
-            // 5. Kiểm tra Địa chỉ
-            if (string.IsNullOrWhiteSpace(txtDiaChi.Text))
+            // 5. Địa chỉ (KHÔNG BẮT BUỘC - Bỏ qua kiểm tra rỗng)
+
+            // 6. Kiểm tra SĐT (KHÔNG BẮT BUỘC - NHƯNG CÓ NHẬP PHẢI ĐÚNG FORMAT)
+            if (!string.IsNullOrWhiteSpace(txtSoDt.Text))
             {
-                MessageBox.Show("Vui lòng nhập Địa chỉ!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDiaChi.Focus();
-                return false;
+                if (!Regex.IsMatch(txtSoDt.Text.Trim(), @"^0\d{9}$"))
+                {
+                    MessageBox.Show("Số điện thoại không hợp lệ!\nPhải bắt đầu bằng số 0 và có đúng 10 chữ số.",
+                        "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSoDt.Focus();
+                    return false;
+                }
             }
 
-            // 6. Kiểm tra SĐT
-            if (string.IsNullOrWhiteSpace(txtSoDt.Text))
+            // 7. Kiểm tra Email (KHÔNG BẮT BUỘC - NHƯNG CÓ NHẬP PHẢI ĐÚNG FORMAT)
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text))
             {
-                MessageBox.Show("Vui lòng nhập Số điện thoại!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSoDt.Focus();
-                return false;
-            }
-            if (!Regex.IsMatch(txtSoDt.Text.Trim(), @"^0\d{9}$"))
-            {
-                MessageBox.Show("Số điện thoại không hợp lệ (phải có 10 số và bắt đầu bằng 0)!", "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSoDt.Focus();
-                return false;
+                if (!Regex.IsMatch(txtEmail.Text.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                {
+                    MessageBox.Show("Email không đúng định dạng (VD: gv@domain.com)!", "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return false;
+                }
             }
 
-            // 7. Kiểm tra Email
-            if (string.IsNullOrWhiteSpace(txtEmail.Text))
-            {
-                MessageBox.Show("Vui lòng nhập Email!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtEmail.Focus();
-                return false;
-            }
-            if (!Regex.IsMatch(txtEmail.Text.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            {
-                MessageBox.Show("Email không đúng định dạng!", "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtEmail.Focus();
-                return false;
-            }
-
-            // 8. Kiểm tra Học hàm
+            // 8. Kiểm tra Học hàm (BẮT BUỘC)
             if (string.IsNullOrWhiteSpace(txtHocHam.Text))
             {
                 MessageBox.Show("Vui lòng nhập Học hàm (Nếu không có ghi 'Không')!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -371,7 +359,7 @@ namespace BTL_LTTQ
                 return false;
             }
 
-            // 9. Kiểm tra Học vị
+            // 9. Kiểm tra Học vị (BẮT BUỘC)
             if (string.IsNullOrWhiteSpace(txtHocVi.Text))
             {
                 MessageBox.Show("Vui lòng nhập Học vị!", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -392,7 +380,7 @@ namespace BTL_LTTQ
 
             string maGV = txtMaGV.Text.Trim();
 
-            // 1. Kiểm tra tồn tại trước khi thêm (Logic formSV)
+            // 1. Kiểm tra tồn tại trước khi thêm (Logic thông minh)
             DataTable check = bll.TimKiemGV(maGV, "");
             if (check != null && check.AsEnumerable().Any(r => r["MaGV"].ToString() == maGV))
             {
@@ -421,7 +409,7 @@ namespace BTL_LTTQ
 
         private void BtnEdit_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMaGV.Text) || txtMaGV.Enabled) // Nếu ô Mã đang Enabled nghĩa là chưa chọn dòng nào
+            if (string.IsNullOrWhiteSpace(txtMaGV.Text) || txtMaGV.Enabled)
             {
                 MessageBox.Show("Vui lòng chọn Giảng viên từ bảng để sửa!", "Cảnh báo");
                 return;
@@ -530,7 +518,7 @@ namespace BTL_LTTQ
                 if (row.Cells["MaGV"].Value?.ToString() == maGV)
                 {
                     row.Selected = true;
-                    row.DefaultCellStyle.BackColor = Color.FromArgb(178, 223, 219); // Màu xanh nhạt (giống formSV)
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(178, 223, 219); // Màu xanh nhạt
                     if (row.Index >= 0 && row.Index < dgvGV.Rows.Count)
                         dgvGV.FirstDisplayedScrollingRowIndex = row.Index;
                 }
@@ -548,7 +536,7 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region 8. Xuất Excel (CSV) - Chuẩn formSV
+        #region 8. Xuất Excel (CSV)
 
         private void BtnExportExcel_Click(object sender, EventArgs e)
         {
