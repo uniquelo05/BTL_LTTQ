@@ -148,9 +148,17 @@ namespace BTL_LTTQ
                 string maGV = UserSession.Instance.MaGV;
                 string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
                 var dt = svBLL.LayTatCaLopTinChi(maGV, loaiTaiKhoan);
+
+                // ✅ THÊM DÒNG MẶC ĐỊNH VÀO ĐẦU DANH SÁCH
+                DataRow empty = dt.NewRow();
+                empty["MaLop"] = DBNull.Value;
+                empty["TenLop"] = "-- Chọn lớp --";
+                dt.Rows.InsertAt(empty, 0);
+
                 cmbTimTheoLop.DataSource = dt;
                 cmbTimTheoLop.DisplayMember = "TenLop";
                 cmbTimTheoLop.ValueMember = "MaLop";
+                cmbTimTheoLop.SelectedIndex = 0; // ✅ CHỌN DÒNG MẶC ĐỊNH
             }
             catch (Exception ex)
             {
@@ -370,6 +378,11 @@ namespace BTL_LTTQ
             isLoadingData = true;
             cmbTimTheoKhoa.SelectedIndex = 0;
             LoadTatCaLopTinChi();
+
+            // ✅ THÊM DÒNG NÀY: Reset combobox lớp về "--chọn lớp--"
+            if (cmbTimTheoLop.Items.Count > 0)
+                cmbTimTheoLop.SelectedIndex = 0;
+
             tbTimKiemTheoMa.Text = "Nhập mã sinh viên...";
             tbTimKiemTheoMa.ForeColor = SystemColors.GrayText;
             isLoadingData = false;

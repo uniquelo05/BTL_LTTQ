@@ -6,7 +6,7 @@ namespace BTL_LTTQ.DAL
 {
     public class DatabaseConnection
     {   
-        private static string connectionString = @"Data Source=EMPHI\SQLEXPRESS;Initial Catalog=QL_GiangDay;Integrated Security=True;Encrypt=False;";
+        private static string connectionString = @"Data Source=LAPTOP-3JGSAUFN\SQLEXPRESS01;Initial Catalog=QL_GiangDay;Integrated Security=True;Encrypt=False;";
         
         // Có thể thêm method để set connection string từ bên ngoài nếu cần
         public static void SetConnectionString(string connString)
