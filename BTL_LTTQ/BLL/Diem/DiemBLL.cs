@@ -1,5 +1,5 @@
 ﻿// Trong file BLL/Diem/DiemBLL.cs
-// Sửa lỗi cú pháp, logic nghiệp vụ và cập nhật hàm Xoa/Sua để dùng khóa chính kép
+// Giữ nguyên logic đã sửa để nhất quán với DiemDAL
 
 using System;
 using System.Data;
@@ -63,13 +63,11 @@ namespace BTL_LTTQ.BLL.Diem
         public string XoaDiem(string MaLop, string MaSV) // Nhận: MaLop, MaSV
         {
             // ... kiểm tra tồn tại
-            // Chú ý: dal.CheckExist(MaLop, MaSV) cũng đang bị ngược thứ tự!
-            // -> Cần sửa lại CheckExist:
-            if (!dal.CheckExist(MaSV, MaLop)) // SỬA: Đổi thứ tự tham số để khớp với DAL
+            if (!dal.CheckExist(MaLop, MaSV))
                 return "Không tìm thấy bản ghi điểm này để xóa!";
 
-            // SỬA: Đổi thứ tự tham số từ (MaLop, MaSV) thành (MaSV, MaLop)
-            return dal.Delete(MaSV, MaLop) ? "Xóa thành công!" : "Xóa thất bại!";
+            // SỬA: Đổi thứ tự tham số thành (MaLop, MaSV) để khớp với DAL mới
+            return dal.Delete(MaLop, MaSV) ? "Xóa thành công!" : "Xóa thất bại!";
         }
         //tìm kiếm theo mã lớp tc/ mã sv  
         public DataTable TimKiem(string maLop, string maSV, string maGV, string loaiTaiKhoan)
