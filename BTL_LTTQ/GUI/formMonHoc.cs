@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using BTL_LTTQ.BLL.Subject;
 using BTL_LTTQ.DTO;
 
@@ -15,13 +16,11 @@ namespace BTL_LTTQ
     {
         private readonly SubjectBLL bll = new SubjectBLL();
         private const string placeholderSearch = "Tìm theo tên hoặc mã môn học...";
-        private List<Subject> currentSubjects;
 
         public formMonHoc()
         {
             InitializeComponent();
             this.Load += formMonHoc_Load;
-            currentSubjects = new List<Subject>();
         }
 
         #region Form Load & Setup
@@ -52,7 +51,7 @@ namespace BTL_LTTQ
             btnXuatExcel.Click += BtnXuatExcel_Click;
             dgvMonHoc.CellClick += DgvMonHoc_CellClick;
 
-            // Placeholder cho ô tìm kiếm
+            // Placeholder tìm kiếm
             txtTimKiem.Enter += (s, e) =>
             {
                 if (txtTimKiem.Text == placeholderSearch)
@@ -84,9 +83,9 @@ namespace BTL_LTTQ
         {
             try
             {
-                currentSubjects = bll.GetAllSubjects();
+                var subjects = bll.GetAllSubjects();
                 dgvMonHoc.DataSource = null;
-                dgvMonHoc.DataSource = currentSubjects;
+                dgvMonHoc.DataSource = subjects;
 
                 // Tùy chỉnh tiêu đề cột
                 if (dgvMonHoc.Columns["MaMH"] != null) dgvMonHoc.Columns["MaMH"].HeaderText = "Mã Môn";
@@ -156,16 +155,12 @@ namespace BTL_LTTQ
             decimal heSoDQT = 0.3M;
             decimal heSoThi = 0.7M;
 
-            if (!string.IsNullOrWhiteSpace(txtHeSoDQT.Text) && decimal.TryParse(txtHeSoDQT.Text, out decimal dqt))
-                heSoDQT = dqt;
+            if (!decimal.TryParse(txtHeSoDQT.Text, out heSoDQT)) heSoDQT = 0.3M;
+            if (!decimal.TryParse(txtHeSoThi.Text, out heSoThi)) heSoThi = 0.7M;
 
-            if (!string.IsNullOrWhiteSpace(txtHeSoThi.Text) && decimal.TryParse(txtHeSoThi.Text, out decimal thi))
-                heSoThi = thi;
-
-            // Kiểm tra tổng hệ số = 1
             if (Math.Abs(heSoDQT + heSoThi - 1.0M) > 0.001M)
             {
-                MessageBox.Show("Tổng hệ số ĐQT và Thi phải bằng 1!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Tổng hệ số Đánh giá quá trình và Thi phải bằng 1!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
@@ -186,6 +181,14 @@ namespace BTL_LTTQ
 
             try
             {
+                // KIỂM TRA TRÙNG MÃ MÔN HỌC
+                if (bll.CheckSubjectExists(subject.MaMH))
+                {
+                    MessageBox.Show("Mã môn học đã tồn tại! Vui lòng nhập mã khác.", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtMaMH.Focus();
+                    return;
+                }
+
                 if (bll.AddSubject(subject))
                 {
                     MessageBox.Show("Thêm môn học thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -205,7 +208,7 @@ namespace BTL_LTTQ
 
         private void BtnSua_Click(object sender, EventArgs e)
         {
-            if (txtMaMH.ReadOnly == false || string.IsNullOrWhiteSpace(txtMaMH.Text))
+            if (!txtMaMH.ReadOnly || string.IsNullOrWhiteSpace(txtMaMH.Text))
             {
                 MessageBox.Show("Vui lòng chọn môn học cần sửa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -224,6 +227,10 @@ namespace BTL_LTTQ
                     LoadDataGridView();
                     ClearFields();
                 }
+                else
+                {
+                    MessageBox.Show("Cập nhật thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             catch (Exception ex)
             {
@@ -233,7 +240,7 @@ namespace BTL_LTTQ
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (txtMaMH.ReadOnly == false || string.IsNullOrWhiteSpace(txtMaMH.Text))
+            if (!txtMaMH.ReadOnly || string.IsNullOrWhiteSpace(txtMaMH.Text))
             {
                 MessageBox.Show("Vui lòng chọn môn học cần xóa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -250,7 +257,7 @@ namespace BTL_LTTQ
             {
                 try
                 {
-                    if (bll.DeleteSubject(txtMaMH.Text))
+                    if (bll.DeleteSubject(txtMaMH.Text.Trim()))
                     {
                         MessageBox.Show("Xóa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadDataGridView();
@@ -271,16 +278,33 @@ namespace BTL_LTTQ
         }
         #endregion
 
-        #region Search
+        #region Search - TÌM KIẾM THÔNG MINH
         private void BtnTimKiem_Click(object sender, EventArgs e)
         {
             string keyword = txtTimKiem.Text == placeholderSearch ? "" : txtTimKiem.Text.Trim();
 
             try
             {
-                List<Subject> results = string.IsNullOrEmpty(keyword)
-                    ? bll.GetAllSubjects()
-                    : bll.SearchSubjects(keyword); // Tìm cả mã và tên
+                List<Subject> results;
+
+                if (string.IsNullOrEmpty(keyword))
+                {
+                    results = bll.GetAllSubjects();
+                }
+                else
+                {
+                    // Kiểm tra xem keyword có giống định dạng mã môn học không (VD: MH001, IT102, CS201...)
+                    bool looksLikeCode = Regex.IsMatch(keyword, @"^[A-Z]{1,4}\d{2,4}$", RegexOptions.IgnoreCase);
+
+                    if (looksLikeCode)
+                    {
+                        results = bll.SearchSubjects(keyword, "", true); // Tìm chính xác theo mã
+                    }
+                    else
+                    {
+                        results = bll.SearchSubjects(keyword); // Tìm theo tên
+                    }
+                }
 
                 dgvMonHoc.DataSource = null;
                 dgvMonHoc.DataSource = results;
@@ -302,10 +326,10 @@ namespace BTL_LTTQ
         }
         #endregion
 
-        #region Export Excel (CSV - UTF8)
+        #region Export CSV (UTF-8, có dấu)
         private void BtnXuatExcel_Click(object sender, EventArgs e)
         {
-            if (dgvMonHoc.Rows.Count == 0)
+            if (dgvMonHoc.Rows.Count == 0 || dgvMonHoc.Rows[0].IsNewRow)
             {
                 MessageBox.Show("Không có dữ liệu để xuất!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -313,7 +337,7 @@ namespace BTL_LTTQ
 
             SaveFileDialog sfd = new SaveFileDialog
             {
-                Filter = "CSV File (*.csv)|*.csv|Excel File (*.xlsx)|*.xlsx",
+                Filter = "CSV File (*.csv)|*.csv|Tất cả file (*.*)|*.*",
                 FileName = $"DanhSach_MonHoc_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
                 Title = "Xuất danh sách môn học"
             };
@@ -351,7 +375,7 @@ namespace BTL_LTTQ
                 if (row.IsNewRow) continue;
                 var cells = row.Cells.Cast<DataGridViewCell>()
                     .Where(cell => dgvMonHoc.Columns[cell.ColumnIndex].Visible)
-                    .Select(cell => $"\"{cell.Value?.ToString().Replace("\"", "\"\"") ?? ""}\"");
+                    .Select(cell => $"\"{(cell.Value?.ToString() ?? "").Replace("\"", "\"\"")}\"");
                 sb.AppendLine(string.Join(",", cells));
             }
 
@@ -359,26 +383,31 @@ namespace BTL_LTTQ
         }
         #endregion
 
-        #region DataGridView Click
+        #region DataGridView Click - CHỌN DÒNG CHUẨN
         private void DgvMonHoc_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || e.RowIndex >= dgvMonHoc.Rows.Count) return;
+            if (e.RowIndex < 0 || e.RowIndex >= dgvMonHoc.Rows.Count || dgvMonHoc.Rows[e.RowIndex].IsNewRow)
+                return;
 
             try
             {
                 var subject = dgvMonHoc.Rows[e.RowIndex].DataBoundItem as Subject;
                 if (subject != null)
                 {
-                    txtMaMH.Text = subject.MaMH;
-                    txtTenMH.Text = subject.TenMH;
+                    txtMaMH.Text = subject.MaMH?.Trim() ?? "";
+                    txtTenMH.Text = subject.TenMH ?? "";
                     numSoTC.Value = subject.SoTC;
                     numSoTietLT.Value = subject.SoTietLT;
                     numSoTietTH.Value = subject.SoTietTH;
-                    txtHeSoDQT.Text = subject.HeSoDQT.ToString("0.0#");
-                    txtHeSoThi.Text = subject.HeSoThi.ToString("0.0#");
-                    cbbMaKhoa.SelectedValue = subject.MaKhoa ?? (object)DBNull.Value;
+                    txtHeSoDQT.Text = subject.HeSoDQT.ToString("0.0##");
+                    txtHeSoThi.Text = subject.HeSoThi.ToString("0.0##");
 
-                    txtMaMH.ReadOnly = true; // Chuyển sang chế độ sửa
+                    if (!string.IsNullOrEmpty(subject.MaKhoa))
+                        cbbMaKhoa.SelectedValue = subject.MaKhoa;
+                    else
+                        cbbMaKhoa.SelectedIndex = -1;
+
+                    txtMaMH.ReadOnly = true;
                 }
             }
             catch (Exception ex)
