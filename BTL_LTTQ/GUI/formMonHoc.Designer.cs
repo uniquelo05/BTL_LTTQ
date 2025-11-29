@@ -29,10 +29,8 @@
             this.lblSearch = new System.Windows.Forms.Label();
             this.pnlInput = new System.Windows.Forms.Panel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.txtMoTa = new System.Windows.Forms.TextBox();
-            this.lblMoTa = new System.Windows.Forms.Label();
-            this.numSoTiet = new System.Windows.Forms.NumericUpDown();
-            this.lblSoTiet = new System.Windows.Forms.Label();
+            this.numSoTietLT = new System.Windows.Forms.NumericUpDown();
+            this.lblSoTietLT = new System.Windows.Forms.Label();
             this.numSoTC = new System.Windows.Forms.NumericUpDown();
             this.lblSoTC = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -50,16 +48,23 @@
             this.btnXuatExcel = new System.Windows.Forms.Button();
             this.pnlData = new System.Windows.Forms.Panel();
             this.dgvMonHoc = new System.Windows.Forms.DataGridView();
+            this.lblSoTietTH = new System.Windows.Forms.Label();
+            this.numSoTietTH = new System.Windows.Forms.NumericUpDown();
+            this.lblHeSoDQT = new System.Windows.Forms.Label();
+            this.txtHeSoDQT = new System.Windows.Forms.TextBox();
+            this.lblHeSoThi = new System.Windows.Forms.Label();
+            this.txtHeSoThi = new System.Windows.Forms.TextBox();
             this.pnlHeader.SuspendLayout();
             this.pnlSearch.SuspendLayout();
             this.pnlInput.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numSoTiet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSoTietLT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSoTC)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.pnlActions.SuspendLayout();
             this.pnlData.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMonHoc)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSoTietTH)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -81,7 +86,7 @@
             this.lblTitle.Location = new System.Drawing.Point(15, 12);
             this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(327, 41);
+            this.lblTitle.Size = new System.Drawing.Size(355, 41);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "📚 QUẢN LÝ MÔN HỌC";
             // 
@@ -171,10 +176,14 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.txtMoTa);
-            this.groupBox2.Controls.Add(this.lblMoTa);
-            this.groupBox2.Controls.Add(this.numSoTiet);
-            this.groupBox2.Controls.Add(this.lblSoTiet);
+            this.groupBox2.Controls.Add(this.txtHeSoThi);
+            this.groupBox2.Controls.Add(this.lblHeSoThi);
+            this.groupBox2.Controls.Add(this.txtHeSoDQT);
+            this.groupBox2.Controls.Add(this.lblHeSoDQT);
+            this.groupBox2.Controls.Add(this.numSoTietTH);
+            this.groupBox2.Controls.Add(this.lblSoTietTH);
+            this.groupBox2.Controls.Add(this.numSoTietLT);
+            this.groupBox2.Controls.Add(this.lblSoTietLT);
             this.groupBox2.Controls.Add(this.numSoTC);
             this.groupBox2.Controls.Add(this.lblSoTC);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -189,53 +198,31 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "📊 Thông tin chi tiết";
             // 
-            // txtMoTa
+            // numSoTietLT
             // 
-            this.txtMoTa.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtMoTa.Location = new System.Drawing.Point(150, 93);
-            this.txtMoTa.Margin = new System.Windows.Forms.Padding(4);
-            this.txtMoTa.Multiline = true;
-            this.txtMoTa.Name = "txtMoTa";
-            this.txtMoTa.Size = new System.Drawing.Size(450, 50);
-            this.txtMoTa.TabIndex = 5;
-            // 
-            // lblMoTa
-            // 
-            this.lblMoTa.AutoSize = true;
-            this.lblMoTa.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblMoTa.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.lblMoTa.Location = new System.Drawing.Point(20, 96);
-            this.lblMoTa.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblMoTa.Name = "lblMoTa";
-            this.lblMoTa.Size = new System.Drawing.Size(59, 23);
-            this.lblMoTa.TabIndex = 4;
-            this.lblMoTa.Text = "Mô tả:";
-            // 
-            // numSoTiet
-            // 
-            this.numSoTiet.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.numSoTiet.Location = new System.Drawing.Point(392, 58);
-            this.numSoTiet.Margin = new System.Windows.Forms.Padding(4);
-            this.numSoTiet.Maximum = new decimal(new int[] {
+            this.numSoTietLT.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.numSoTietLT.Location = new System.Drawing.Point(448, 58);
+            this.numSoTietLT.Margin = new System.Windows.Forms.Padding(4);
+            this.numSoTietLT.Maximum = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            this.numSoTiet.Name = "numSoTiet";
-            this.numSoTiet.Size = new System.Drawing.Size(208, 30);
-            this.numSoTiet.TabIndex = 3;
+            this.numSoTietLT.Name = "numSoTietLT";
+            this.numSoTietLT.Size = new System.Drawing.Size(61, 30);
+            this.numSoTietLT.TabIndex = 3;
             // 
-            // lblSoTiet
+            // lblSoTietLT
             // 
-            this.lblSoTiet.AutoSize = true;
-            this.lblSoTiet.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblSoTiet.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.lblSoTiet.Location = new System.Drawing.Point(312, 61);
-            this.lblSoTiet.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblSoTiet.Name = "lblSoTiet";
-            this.lblSoTiet.Size = new System.Drawing.Size(68, 23);
-            this.lblSoTiet.TabIndex = 2;
-            this.lblSoTiet.Text = "Số tiết:";
+            this.lblSoTietLT.AutoSize = true;
+            this.lblSoTietLT.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblSoTietLT.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblSoTietLT.Location = new System.Drawing.Point(312, 61);
+            this.lblSoTietLT.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblSoTietLT.Name = "lblSoTietLT";
+            this.lblSoTietLT.Size = new System.Drawing.Size(124, 23);
+            this.lblSoTietLT.TabIndex = 2;
+            this.lblSoTietLT.Text = "Số tiết lý thyết:";
             // 
             // numSoTC
             // 
@@ -259,7 +246,7 @@
             this.lblSoTC.Location = new System.Drawing.Point(20, 61);
             this.lblSoTC.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSoTC.Name = "lblSoTC";
-            this.lblSoTC.Size = new System.Drawing.Size(99, 23);
+            this.lblSoTC.Size = new System.Drawing.Size(97, 23);
             this.lblSoTC.TabIndex = 0;
             this.lblSoTC.Text = "Số tín chỉ: *";
             // 
@@ -302,7 +289,7 @@
             this.lblMaKhoa.Location = new System.Drawing.Point(20, 115);
             this.lblMaKhoa.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMaKhoa.Name = "lblMaKhoa";
-            this.lblMaKhoa.Size = new System.Drawing.Size(74, 23);
+            this.lblMaKhoa.Size = new System.Drawing.Size(65, 23);
             this.lblMaKhoa.TabIndex = 4;
             this.lblMaKhoa.Text = "Khoa: *";
             // 
@@ -323,7 +310,7 @@
             this.lblTenMH.Location = new System.Drawing.Point(20, 80);
             this.lblTenMH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTenMH.Name = "lblTenMH";
-            this.lblTenMH.Size = new System.Drawing.Size(131, 23);
+            this.lblTenMH.Size = new System.Drawing.Size(125, 23);
             this.lblTenMH.TabIndex = 2;
             this.lblTenMH.Text = "Tên môn học: *";
             // 
@@ -344,7 +331,7 @@
             this.lblMaMH.Location = new System.Drawing.Point(20, 45);
             this.lblMaMH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMaMH.Name = "lblMaMH";
-            this.lblMaMH.Size = new System.Drawing.Size(128, 23);
+            this.lblMaMH.Size = new System.Drawing.Size(123, 23);
             this.lblMaMH.TabIndex = 0;
             this.lblMaMH.Text = "Mã môn học: *";
             // 
@@ -506,6 +493,74 @@
             this.dgvMonHoc.Size = new System.Drawing.Size(1270, 305);
             this.dgvMonHoc.TabIndex = 0;
             // 
+            // lblSoTietTH
+            // 
+            this.lblSoTietTH.AutoSize = true;
+            this.lblSoTietTH.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblSoTietTH.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblSoTietTH.Location = new System.Drawing.Point(20, 112);
+            this.lblSoTietTH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblSoTietTH.Name = "lblSoTietTH";
+            this.lblSoTietTH.Size = new System.Drawing.Size(146, 23);
+            this.lblSoTietTH.TabIndex = 4;
+            this.lblSoTietTH.Text = "Số tiết thực hành:";
+            // 
+            // numSoTietTH
+            // 
+            this.numSoTietTH.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.numSoTietTH.Location = new System.Drawing.Point(174, 110);
+            this.numSoTietTH.Margin = new System.Windows.Forms.Padding(4);
+            this.numSoTietTH.Maximum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.numSoTietTH.Name = "numSoTietTH";
+            this.numSoTietTH.Size = new System.Drawing.Size(61, 30);
+            this.numSoTietTH.TabIndex = 5;
+            // 
+            // lblHeSoDQT
+            // 
+            this.lblHeSoDQT.AutoSize = true;
+            this.lblHeSoDQT.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblHeSoDQT.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblHeSoDQT.Location = new System.Drawing.Point(260, 115);
+            this.lblHeSoDQT.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblHeSoDQT.Name = "lblHeSoDQT";
+            this.lblHeSoDQT.Size = new System.Drawing.Size(95, 23);
+            this.lblHeSoDQT.TabIndex = 6;
+            this.lblHeSoDQT.Text = "Hệ số DQT:";
+            // 
+            // txtHeSoDQT
+            // 
+            this.txtHeSoDQT.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtHeSoDQT.Location = new System.Drawing.Point(363, 108);
+            this.txtHeSoDQT.Margin = new System.Windows.Forms.Padding(4);
+            this.txtHeSoDQT.Name = "txtHeSoDQT";
+            this.txtHeSoDQT.Size = new System.Drawing.Size(56, 30);
+            this.txtHeSoDQT.TabIndex = 7;
+            // 
+            // lblHeSoThi
+            // 
+            this.lblHeSoThi.AutoSize = true;
+            this.lblHeSoThi.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblHeSoThi.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblHeSoThi.Location = new System.Drawing.Point(427, 112);
+            this.lblHeSoThi.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblHeSoThi.Name = "lblHeSoThi";
+            this.lblHeSoThi.Size = new System.Drawing.Size(82, 23);
+            this.lblHeSoThi.TabIndex = 8;
+            this.lblHeSoThi.Text = "Hệ số thi:";
+            // 
+            // txtHeSoThi
+            // 
+            this.txtHeSoThi.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtHeSoThi.Location = new System.Drawing.Point(517, 110);
+            this.txtHeSoThi.Margin = new System.Windows.Forms.Padding(4);
+            this.txtHeSoThi.Name = "txtHeSoThi";
+            this.txtHeSoThi.Size = new System.Drawing.Size(56, 30);
+            this.txtHeSoThi.TabIndex = 9;
+            // 
             // formMonHoc
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -529,14 +584,16 @@
             this.pnlInput.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numSoTiet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSoTietLT)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSoTC)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.pnlActions.ResumeLayout(false);
             this.pnlData.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvMonHoc)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSoTietTH)).EndInit();
             this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -562,14 +619,18 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.NumericUpDown numSoTC;
         private System.Windows.Forms.Label lblSoTC;
-        private System.Windows.Forms.NumericUpDown numSoTiet;
-        private System.Windows.Forms.Label lblSoTiet;
-        private System.Windows.Forms.TextBox txtMoTa;
-        private System.Windows.Forms.Label lblMoTa;
+        private System.Windows.Forms.NumericUpDown numSoTietLT;
+        private System.Windows.Forms.Label lblSoTietLT;
         private System.Windows.Forms.Button btnSua;
         private System.Windows.Forms.Button btnXoa;
         private System.Windows.Forms.Button btnLamMoi;
         private System.Windows.Forms.Button btnTatCa;
         private System.Windows.Forms.Button btnXuatExcel;
+        private System.Windows.Forms.Label lblSoTietTH;
+        private System.Windows.Forms.NumericUpDown numSoTietTH;
+        private System.Windows.Forms.Label lblHeSoDQT;
+        private System.Windows.Forms.TextBox txtHeSoThi;
+        private System.Windows.Forms.Label lblHeSoThi;
+        private System.Windows.Forms.TextBox txtHeSoDQT;
     }
 }
