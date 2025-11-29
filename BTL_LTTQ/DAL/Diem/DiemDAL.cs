@@ -1,5 +1,6 @@
 ﻿using BTL_LTTQ.DTO;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -7,34 +8,41 @@ namespace BTL_LTTQ.DAL.Diem
 {
     internal class DiemDAL
     {
-        // Lấy toàn bộ danh sách điểm theo MaGV
+        // ✅ SỬA: Lấy toàn bộ danh sách điểm theo MaGV
         public DataTable GetAll(string maGV, string loaiTaiKhoan)
         {
-            string query = @"SELECT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
-                             FROM Diem d 
-                             JOIN SinhVien sv ON d.MaSV = sv.MaSV
-                             JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
-                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
-                             WHERE d.DiemKTHP IS NOT NULL"; // Đã thêm điều kiện lọc
+            string query = @"
+                SELECT DISTINCT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
+                FROM Diem d 
+                INNER JOIN SinhVien sv ON d.MaSV = sv.MaSV
+                INNER JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop";
 
-            if (loaiTaiKhoan != "Admin")
+            // Chỉ JOIN PhanCongGiangDay khi cần kiểm tra quyền
+            if (loaiTaiKhoan != "Admin" && loaiTaiKhoan != "Quản trị viên")
             {
-                query += " AND pc.MaGV = @MaGV";
+                query += @"
+                INNER JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                WHERE pc.MaGV = @MaGV";
+
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@MaGV", maGV ?? (object)DBNull.Value)
+                };
+
+                return DatabaseConnection.ExecuteQuery(query, parameters);
             }
-
-            SqlParameter[] parameters = loaiTaiKhoan == "Admin" ? new SqlParameter[] { } : new SqlParameter[]
+            else
             {
-                new SqlParameter("@MaGV", maGV)
-            };
-
-            return DatabaseConnection.ExecuteQuery(query, parameters);
+                // Admin xem tất cả
+                return DatabaseConnection.ExecuteQuery(query);
+            }
         }
 
-        // Thêm mới điểm
+        // Thêm mới điểm (GIỮ NGUYÊN)
         public bool Insert(Score diem, string maGV, string loaiTaiKhoan)
         {
             // Kiểm tra nếu không phải Admin thì phải xác nhận lớp thuộc về giảng viên
-            if (loaiTaiKhoan != "Admin")
+            if (loaiTaiKhoan != "Admin" && loaiTaiKhoan != "Quản trị viên")
             {
                 string checkQuery = @"SELECT COUNT(*)
                                       FROM LopTinChi ltc
@@ -69,7 +77,7 @@ namespace BTL_LTTQ.DAL.Diem
 
             SqlParameter[] parameters = new SqlParameter[]
             {
-                new SqlParameter("@MaLop", diem.MaLop),
+new SqlParameter("@MaLop", diem.MaLop),
                 new SqlParameter("@MaSV", diem.MaSV),
                 new SqlParameter("@DiemCc", diem.DiemCc),
                 new SqlParameter("@DiemGK", diem.DiemGK),
@@ -79,7 +87,7 @@ namespace BTL_LTTQ.DAL.Diem
             return DatabaseConnection.ExecuteNonQuery(query, parameters) > 0;
         }
 
-        // Cập nhật điểm
+        // Cập nhật điểm (GIỮ NGUYÊN)
         public bool Update(Score diem)
         {
             string query = @"
@@ -106,8 +114,8 @@ namespace BTL_LTTQ.DAL.Diem
             return DatabaseConnection.ExecuteNonQuery(query, parameters) > 0;
         }
 
-        // Xóa điểm
-        public bool Delete(string MaLop, string MaSV) // Đã sửa: (MaLop, MaSV)
+        // Xóa điểm (GIỮ NGUYÊN)
+        public bool Delete(string MaSV, string MaLop)
         {
             string query = "DELETE FROM Diem WHERE MaLop = @MaLop AND MaSV = @MaSV";
 
@@ -120,8 +128,8 @@ namespace BTL_LTTQ.DAL.Diem
             return DatabaseConnection.ExecuteNonQuery(query, parameters) > 0;
         }
 
-        // Kiểm tra sinh viên đã có điểm trong lớp chưa
-        public bool CheckExist(string MaLop, string MaSV) // Đã sửa: (MaLop, MaSV)
+        // Kiểm tra sinh viên đã có điểm trong lớp chưa (GIỮ NGUYÊN)
+        public bool CheckExist(string MaSV, string MaLop)
         {
             string query = "SELECT COUNT(*) FROM Diem WHERE MaLop = @MaLop AND MaSV = @MaSV";
 
@@ -135,36 +143,49 @@ namespace BTL_LTTQ.DAL.Diem
             return count > 0;
         }
 
-        // Tìm kiếm theo mã lớp, mã SV và MaGV
+        // ✅ SỬA: Tìm kiếm theo mã lớp, mã SV và MaGV
         public DataTable Search(string maLop, string maSV, string maGV, string loaiTaiKhoan)
         {
-            string query = @"SELECT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
-                             FROM Diem d
-                             JOIN SinhVien sv ON d.MaSV = sv.MaSV
-                             JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
-                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
-                             WHERE d.DiemKTHP IS NOT NULL"; // Đã thêm điều kiện lọc
+            string query = @"
+                SELECT DISTINCT d.MaSV, sv.TenSV, d.MaLop, d.DiemCC, d.DiemGK, d.DiemThi, d.DiemKTHP
+                FROM Diem d
+                INNER JOIN SinhVien sv ON d.MaSV = sv.MaSV
+                INNER JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop";
 
-            if (loaiTaiKhoan != "Admin")
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            List<string> conditions = new List<string>();
+
+            // Kiểm tra quyền giảng viên
+            if (loaiTaiKhoan != "Admin" && loaiTaiKhoan != "Quản trị viên")
             {
-                query += " AND pc.MaGV = @MaGV";
+                query += " INNER JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop";
+                conditions.Add("pc.MaGV = @MaGV");
+                paramList.Add(new SqlParameter("@MaGV", maGV ?? (object)DBNull.Value));
             }
 
-            query += @" AND ( @MaLop IS NULL OR @MaLop = '' OR d.MaLop = @MaLop )
-                        AND ( @MaSV IS NULL OR @MaSV = '' OR d.MaSV = @MaSV )";
-
-            SqlParameter[] parameters = loaiTaiKhoan == "Admin" ? new SqlParameter[]
+            // Tìm theo Mã lớp
+            if (!string.IsNullOrWhiteSpace(maLop))
             {
-                new SqlParameter("@MaLop", string.IsNullOrWhiteSpace(maLop) ? (object)DBNull.Value : maLop),
-                new SqlParameter("@MaSV", string.IsNullOrWhiteSpace(maSV) ? (object)DBNull.Value : maSV)
-            } : new SqlParameter[]
-            {
-                new SqlParameter("@MaGV", maGV),
-                new SqlParameter("@MaLop", string.IsNullOrWhiteSpace(maLop) ? (object)DBNull.Value : maLop),
-                new SqlParameter("@MaSV", string.IsNullOrWhiteSpace(maSV) ? (object)DBNull.Value : maSV)
-            };
+                conditions.Add("d.MaLop = @MaLop");
+                paramList.Add(new SqlParameter("@MaLop", maLop));
+            }
 
-            return DatabaseConnection.ExecuteQuery(query, parameters);
+            // Tìm theo Mã SV
+            if (!string.IsNullOrWhiteSpace(maSV))
+            {
+                conditions.Add("d.MaSV = @MaSV");
+                paramList.Add(new SqlParameter("@MaSV", maSV));
+            }
+
+            // Ghép điều kiện WHERE
+            if (conditions.Count > 0)
+            {
+                query += " WHERE " + string.Join(" AND ", conditions);
+            }
+
+            query += " ORDER BY d.MaSV, d.MaLop";
+
+            return DatabaseConnection.ExecuteQuery(query, paramList.ToArray());
         }
     }
 }
