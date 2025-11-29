@@ -1,6 +1,5 @@
 ﻿using BTL_LTTQ.DTO;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -15,11 +14,12 @@ namespace BTL_LTTQ.DAL.Diem
                              FROM Diem d 
                              JOIN SinhVien sv ON d.MaSV = sv.MaSV
                              JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
-                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop";
+                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                             WHERE d.DiemKTHP IS NOT NULL"; // Đã thêm điều kiện lọc
 
             if (loaiTaiKhoan != "Admin")
             {
-                query += " WHERE pc.MaGV = @MaGV";
+                query += " AND pc.MaGV = @MaGV";
             }
 
             SqlParameter[] parameters = loaiTaiKhoan == "Admin" ? new SqlParameter[] { } : new SqlParameter[]
@@ -107,7 +107,7 @@ namespace BTL_LTTQ.DAL.Diem
         }
 
         // Xóa điểm
-        public bool Delete(string MaSV, string MaLop)
+        public bool Delete(string MaLop, string MaSV) // Đã sửa: (MaLop, MaSV)
         {
             string query = "DELETE FROM Diem WHERE MaLop = @MaLop AND MaSV = @MaSV";
 
@@ -121,7 +121,7 @@ namespace BTL_LTTQ.DAL.Diem
         }
 
         // Kiểm tra sinh viên đã có điểm trong lớp chưa
-        public bool CheckExist(string MaSV, string MaLop)
+        public bool CheckExist(string MaLop, string MaSV) // Đã sửa: (MaLop, MaSV)
         {
             string query = "SELECT COUNT(*) FROM Diem WHERE MaLop = @MaLop AND MaSV = @MaSV";
 
@@ -142,11 +142,12 @@ namespace BTL_LTTQ.DAL.Diem
                              FROM Diem d
                              JOIN SinhVien sv ON d.MaSV = sv.MaSV
                              JOIN LopTinChi ltc ON d.MaLop = ltc.MaLop
-                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop";
+                             JOIN PhanCongGiangDay pc ON ltc.MaLop = pc.MaLop
+                             WHERE d.DiemKTHP IS NOT NULL"; // Đã thêm điều kiện lọc
 
             if (loaiTaiKhoan != "Admin")
             {
-                query += " WHERE pc.MaGV = @MaGV";
+                query += " AND pc.MaGV = @MaGV";
             }
 
             query += @" AND ( @MaLop IS NULL OR @MaLop = '' OR d.MaLop = @MaLop )

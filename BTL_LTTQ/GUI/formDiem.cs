@@ -371,13 +371,24 @@ namespace BTL_LTTQ
         {
             try
             {
+                // Hộp thoại chọn nơi lưu file
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Title = "Lưu file Excel";
+                saveFileDialog.Filter = "Excel File (*.xlsx)|*.xlsx";
+                saveFileDialog.FileName = "DanhSach.xlsx";
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                // Tạo Excel Application
                 Excel.Application excelApp = new Excel.Application();
-                excelApp.Application.Workbooks.Add(Type.Missing);
+                Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+                Excel.Worksheet worksheet = workbook.ActiveSheet;
 
                 // Đặt tiêu đề cột
                 for (int i = 1; i <= dgv.Columns.Count; i++)
                 {
-                    excelApp.Cells[1, i] = dgv.Columns[i - 1].HeaderText;
+                    worksheet.Cells[1, i] = dgv.Columns[i - 1].HeaderText;
                 }
 
                 // Ghi dữ liệu từng dòng
@@ -385,20 +396,25 @@ namespace BTL_LTTQ
                 {
                     for (int j = 0; j < dgv.Columns.Count; j++)
                     {
-                        excelApp.Cells[i + 2, j + 1] = dgv.Rows[i].Cells[j].Value?.ToString();
+                        worksheet.Cells[i + 2, j + 1] = dgv.Rows[i].Cells[j].Value?.ToString();
                     }
                 }
 
-                // Hiện file Excel
-                excelApp.Visible = true;
+                // Lưu file vào đường dẫn đã chọn
+                workbook.SaveAs(saveFileDialog.FileName);
+                workbook.Close();
+                excelApp.Quit();
 
-                MessageBox.Show("Xuất Excel thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Xuất Excel thành công!", "Thông báo",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi xuất Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi xuất Excel: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         #endregion
     }
