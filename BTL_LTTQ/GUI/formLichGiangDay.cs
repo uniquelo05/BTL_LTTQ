@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using BTL_LTTQ.BLL.Schedule;
 using Excel = Microsoft.Office.Interop.Excel;
 using BTL_LTTQ.DTO;
+using BTL_LTTQ.BLL.Session; // Đừng quên import Session
 
 namespace BTL_LTTQ.GUI
 {
@@ -26,11 +27,31 @@ namespace BTL_LTTQ.GUI
                 LoadComboBoxData();
                 SetDefaultValues();
                 AttachEvents();
+
+                // --- PHÂN QUYỀN: CHỈNH SỬA TẠI ĐÂY ---
+                ApplyPermissions();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khởi tạo form: {ex.Message}", "Lỗi", 
+                MessageBox.Show($"Lỗi khởi tạo form: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ApplyPermissions()
+        {
+            // Kiểm tra nếu người đăng nhập không phải Admin (tức là Giảng viên)
+            if (!UserSession.Instance.IsAdmin())
+            {
+                // 1. Tự động điền mã GV của người đang đăng nhập
+                txtMaGV.Text = UserSession.Instance.MaGV;
+
+                // 2. Khóa ô nhập liệu để không cho sửa
+                txtMaGV.Enabled = false;
+                // Hoặc dùng: txtMaGV.ReadOnly = true;
+
+                // 3. (Tùy chọn) Tự động load lịch luôn nếu đã chọn đủ thông tin mặc định
+                // btnTimKiem_Click(null, null); 
             }
         }
 
@@ -47,23 +68,18 @@ namespace BTL_LTTQ.GUI
         {
             if (cboNamHoc.Items.Count > 0)
                 cboNamHoc.SelectedIndex = cboNamHoc.Items.Count - 1; // Năm mới nhất
-            
+
             if (cboHocKy.Items.Count > 0)
                 cboHocKy.SelectedIndex = 0; // Học kỳ 1
-            
+
             if (cboTuan.Items.Count > 0)
                 cboTuan.SelectedIndex = 0; // Tuần 1
         }
 
         private void AttachEvents()
         {
-            // ✅ ĐỔI TÊN: btnXem -> btnTimKiem
             btnTimKiem.Click += btnTimKiem_Click;
-            
-            // ✅ ĐỔI TÊN: btnSearch -> btnLamMoi
             btnLamMoi.Click += btnLamMoi_Click;
-            
-            // ✅ ĐỔI TÊN: btnExportSchedule -> btnXuatExcel
             btnXuatExcel.Click += btnXuatExcel_Click;
         }
 
@@ -78,21 +94,21 @@ namespace BTL_LTTQ.GUI
             // Ngăn sort
             foreach (DataGridViewColumn col in dgvSchedule.Columns)
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
-            //
-            dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            dgvSchedule.ColumnHeadersHeight = 60; // Đặt chiều cao tiêu đề là 45px (bạn có thể điều chỉnh)
 
-            // ✅ 5 ca cố định
+            dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dgvSchedule.ColumnHeadersHeight = 60;
+
+            // 5 ca cố định
             dgvSchedule.Rows.Add("Ca 1", "7h00 - 9h30", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 2", "9h35 - 12h00", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 3", "13h00 - 15h30", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 4", "15h35 - 18h00", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 5", "18h30 - 21h00", "", "", "", "", "", "", "");
+
             if (tuanStart.HasValue)
             {
                 DateTime startDay = GetStartOfWeek(tuanStart.Value);
 
-                // Sử dụng định dạng "Thứ X\n(dd/MM)"
                 dgvSchedule.Columns["colThuHai"].HeaderText = $"Thứ Hai\n({startDay:dd/MM})";
                 dgvSchedule.Columns["colThuBa"].HeaderText = $"Thứ Ba\n({startDay.AddDays(1):dd/MM})";
                 dgvSchedule.Columns["colThuTu"].HeaderText = $"Thứ Tư\n({startDay.AddDays(2):dd/MM})";
@@ -103,7 +119,6 @@ namespace BTL_LTTQ.GUI
             }
             else
             {
-                // Khởi tạo mặc định nếu chưa có tuần
                 dgvSchedule.Columns["colThuHai"].HeaderText = "Thứ Hai";
                 dgvSchedule.Columns["colThuBa"].HeaderText = "Thứ Ba";
                 dgvSchedule.Columns["colThuTu"].HeaderText = "Thứ Tư";
@@ -112,14 +127,13 @@ namespace BTL_LTTQ.GUI
                 dgvSchedule.Columns["colThuBay"].HeaderText = "Thứ Bảy";
                 dgvSchedule.Columns["colChuNhat"].HeaderText = "Chủ Nhật";
             }
-            // Style cho cột Ca và Giờ
+
+            // Style
             dgvSchedule.Columns["colCa"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvSchedule.Columns["colCa"].DefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-
             dgvSchedule.Columns["colGio"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvSchedule.Columns["colGio"].DefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9F);
 
-            // Style cho các ô môn học
             var cellStyle = new DataGridViewCellStyle
             {
                 WrapMode = DataGridViewTriState.True,
@@ -138,9 +152,9 @@ namespace BTL_LTTQ.GUI
 
             dgvSchedule.ClearSelection();
         }
+
         private DateTime GetStartOfWeek(DateTime date)
         {
-            // Thứ Hai là ngày đầu tuần
             int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
             return date.AddDays(-1 * diff).Date;
         }
@@ -149,7 +163,7 @@ namespace BTL_LTTQ.GUI
 
         #region Button Events
 
-        private void btnTimKiem_Click(object sender, EventArgs e) // ✅ ĐỔI TÊN TỪ btnXem_Click
+        private void btnTimKiem_Click(object sender, EventArgs e)
         {
             try
             {
@@ -157,7 +171,7 @@ namespace BTL_LTTQ.GUI
                 string maGV = txtMaGV.Text.Trim();
                 if (string.IsNullOrWhiteSpace(maGV))
                 {
-                    MessageBox.Show("Vui lòng nhập mã giảng viên!", "Cảnh báo", 
+                    MessageBox.Show("Vui lòng nhập mã giảng viên!", "Cảnh báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtMaGV.Focus();
                     return;
@@ -184,8 +198,9 @@ namespace BTL_LTTQ.GUI
                 // 5. Lấy lịch
                 var list = scheduleBLL.LoadSchedule(maGV, tuanStart, tuanEnd);
 
-                // 6. Xóa + khởi tạo lại và truyền TUANSTART để đặt tiêu đề
-                InitializeScheduleGrid(tuanStart); // ĐÃ THAY ĐỔI!
+                // 6. Xóa + khởi tạo lại
+                InitializeScheduleGrid(tuanStart);
+
                 // 7. Đổ dữ liệu
                 foreach (var item in list)
                 {
@@ -207,40 +222,46 @@ namespace BTL_LTTQ.GUI
                     {
                         string cellText = $"{item.MonHoc}\nPhòng: {item.Phong}\n({item.NgayBD:dd/MM} - {item.NgayKT:dd/MM})";
                         dgvSchedule.Rows[rowIndex].Cells[colIndex].Value = cellText;
-                        
+
                         // Highlight
-                        dgvSchedule.Rows[rowIndex].Cells[colIndex].Style.BackColor = 
+                        dgvSchedule.Rows[rowIndex].Cells[colIndex].Style.BackColor =
                             System.Drawing.Color.FromArgb(225, 245, 254);
-                        dgvSchedule.Rows[rowIndex].Cells[colIndex].Style.ForeColor = 
+                        dgvSchedule.Rows[rowIndex].Cells[colIndex].Style.ForeColor =
                             System.Drawing.Color.FromArgb(1, 87, 155);
                     }
                 }
 
-                MessageBox.Show($"✅ Đã tải lịch giảng dạy tuần {tuan} - Học kỳ {hocKy}/{namHoc}", 
-                    "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Chỉ hiện thông báo nếu là Admin hoặc người dùng tự bấm nút
+                // MessageBox.Show($"✅ Đã tải lịch giảng dạy tuần {tuan} - Học kỳ {hocKy}/{namHoc}", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi xem lịch: {ex.Message}", 
+                MessageBox.Show($"Lỗi khi xem lịch: {ex.Message}",
                     "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void btnLamMoi_Click(object sender, EventArgs e) // ✅ ĐỔI TÊN TỪ btnSearch_Click
+        private void btnLamMoi_Click(object sender, EventArgs e)
         {
             // Reset về trạng thái ban đầu
-            txtMaGV.Clear();
+            // NẾU LÀ ADMIN THÌ MỚI ĐƯỢC XÓA MÃ GV
+            if (UserSession.Instance.IsAdmin())
+            {
+                txtMaGV.Clear();
+            }
+            // NẾU LÀ GIẢNG VIÊN THÌ GIỮ NGUYÊN MÃ
+
             SetDefaultValues();
             InitializeScheduleGrid();
         }
 
-        private void btnXuatExcel_Click(object sender, EventArgs e) // ✅ ĐỔI TÊN TỪ btnExportSchedule_Click
+        private void btnXuatExcel_Click(object sender, EventArgs e)
         {
             try
             {
                 if (dgvSchedule.Rows.Count == 0)
                 {
-                    MessageBox.Show("Không có dữ liệu để xuất!", "Cảnh báo", 
+                    MessageBox.Show("Không có dữ liệu để xuất!", "Cảnh báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -257,9 +278,9 @@ namespace BTL_LTTQ.GUI
                 {
                     ws.Cells[1, col + 1] = dgvSchedule.Columns[col].HeaderText;
                     ((Excel.Range)ws.Cells[1, col + 1]).Font.Bold = true;
-                    ((Excel.Range)ws.Cells[1, col + 1]).Interior.Color = 
+                    ((Excel.Range)ws.Cells[1, col + 1]).Interior.Color =
                         System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.FromArgb(0, 150, 136));
-                    ((Excel.Range)ws.Cells[1, col + 1]).Font.Color = 
+                    ((Excel.Range)ws.Cells[1, col + 1]).Font.Color =
                         System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
                 }
 
@@ -272,7 +293,6 @@ namespace BTL_LTTQ.GUI
                     }
                 }
 
-                // Auto-fit columns
                 ws.Columns.AutoFit();
 
                 SaveFileDialog sfd = new SaveFileDialog();
@@ -284,7 +304,7 @@ namespace BTL_LTTQ.GUI
                     wb.SaveAs(sfd.FileName);
                     wb.Close();
                     excel.Quit();
-                    MessageBox.Show($"✅ XUẤT EXCEL THÀNH CÔNG!\n\nĐường dẫn: {sfd.FileName}", 
+                    MessageBox.Show($"✅ XUẤT EXCEL THÀNH CÔNG!\n\nĐường dẫn: {sfd.FileName}",
                         "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -295,7 +315,7 @@ namespace BTL_LTTQ.GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi xuất Excel: {ex.Message}", "Lỗi", 
+                MessageBox.Show($"Lỗi xuất Excel: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
