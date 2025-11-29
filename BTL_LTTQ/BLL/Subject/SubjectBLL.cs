@@ -296,11 +296,5 @@ namespace BTL_LTTQ.BLL.Subject
                 throw new Exception("Lỗi trong BLL khi tìm kiếm môn học: " + ex.Message);
             }
         }
-
-        // Tìm kiếm môn học (backward compatibility)
-        public List<DTO.Subject> SearchSubjects(string tenMH = "", string maKhoa = "")
-        {
-            return SearchSubjects(tenMH, maKhoa, false);
-        }
     }
 }

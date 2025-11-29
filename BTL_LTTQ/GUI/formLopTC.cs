@@ -1,5 +1,4 @@
-﻿// formLopTC.cs (đã được refactor)
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -7,15 +6,19 @@ using System.Linq;
 using System.Windows.Forms;
 using BTL_LTTQ.BLL;
 using BTL_LTTQ.DTO;
-using BTL_LTTQ.DAL;
 using System.IO;
 using System.Text;
+using System.Globalization;
 
 namespace BTL_LTTQ
 {
     public partial class formLopTC : Form
     {
         private readonly LopTC_BLL bll = new LopTC_BLL();
+
+        // Cờ kiểm soát để không chạy tìm kiếm khi form đang load
+        private bool isLoadingData = false;
+
         private const string placeholderMaLop = "nhập mã lớp";
 
         public formLopTC()
@@ -24,23 +27,29 @@ namespace BTL_LTTQ
             this.Load += formLopTC_Load;
         }
 
-        #region Form Load
+        #region Form Load & Cấu hình
 
         private void formLopTC_Load(object sender, EventArgs e)
         {
             try
             {
+                isLoadingData = true; // Bắt đầu load dữ liệu -> Chặn tìm kiếm tự động
+
                 dgvSV.AutoGenerateColumns = false;
                 SetupDataGridViewColumns();
-                LoadDataGridView();
-                LoadComboBoxes();
-                AttachEventHandlers();
+
                 SetPlaceholderText();
+                LoadComboBoxes();      // Load Khoa/Môn
+                LoadDataGridView();    // Load danh sách Lớp TC
+
                 ClearFields();
+                AttachEventHandlers(); // Gắn sự kiện sau khi load xong
+
+                isLoadingData = false; // Load xong -> Cho phép tìm kiếm tự động
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khởi tạo form: {ex.Message}", "Lỗi", 
+                MessageBox.Show($"Lỗi khởi tạo form: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -49,168 +58,75 @@ namespace BTL_LTTQ
         {
             dgvSV.Columns.Clear();
 
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "MaLop",
-                Name = "MaLop",
-                HeaderText = "Mã Lớp",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
+            AddColumn("MaLop", "Mã Lớp", "MaLop");
+            AddColumn("MaMH", "Mã Môn", "MaMH");
+            AddColumn("TenMH", "Tên Môn", "TenMH", true); // Fill
+            AddColumn("MaKhoa", "Khoa", "MaKhoa");
+            AddColumn("HocKy", "Học kỳ", "HocKy");
+            AddColumn("NamHoc", "Năm học", "NamHoc");
+            AddColumn("TinhTrangLop", "Tình Trạng", "TinhTrangLop");
+        }
 
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
+        private void AddColumn(string name, string header, string dataProp, bool isFill = false)
+        {
+            var col = new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "MaMH",
-                Name = "MaMH",
-                HeaderText = "Mã Môn",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "TenMH",
-                Name = "TenMH",
-                HeaderText = "Tên Môn",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            });
-
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "MaKhoa",
-                Name = "MaKhoa",
-                HeaderText = "Khoa",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "HocKy",
-                Name = "HocKy",
-                HeaderText = "Học kỳ",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "NamHoc",
-                Name = "NamHoc",
-                HeaderText = "Năm học",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            dgvSV.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "TinhTrangLop",
-                Name = "TinhTrangLop",
-                HeaderText = "Tình Trạng",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
+                Name = name,
+                HeaderText = header,
+                DataPropertyName = dataProp,
+                AutoSizeMode = isFill ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.AllCells
+            };
+            dgvSV.Columns.Add(col);
         }
 
         private void AttachEventHandlers()
         {
+            // CRUD
             btnThem.Click += btnThem_Click;
             btnSua.Click += btnSua_Click;
             btnXoa.Click += btnXoa_Click;
-            btnLamMoi.Click += btnLamMoi_Click; // ✅ ĐỔI TỪ btnRefresh
-            btnSearch.Click += btnSearch_Click; // ✅ ĐỔI TỪ btnTimKiem
-            btnRefreshSearch.Click += btnRefreshSearch_Click; // ✅ ĐỔI TỪ btnTatCa
-            dgvSV.CellClick += dgvSV_CellClick;
-            txtTimKiemTheoTen.Enter += txtTimKiemTheoTen_Enter; // ✅ ĐỔI TỪ tbTimKiemTheoTen
-            txtTimKiemTheoTen.Leave += txtTimKiemTheoTen_Leave; // ✅ ĐỔI TỪ tbTimKiemTheoTen
-            cbbMaKhoa.SelectedIndexChanged += cbbMaKhoa_SelectedIndexChanged;
-            dgvSV.CellFormatting += dgvSV_CellFormatting;
+            btnLamMoi.Click += btnLamMoi_Click;
             btnXuatExcel.Click += btnXuatExcel_Click;
+
+            // Grid Interaction
+            dgvSV.CellClick += dgvSV_CellClick;
+            dgvSV.CellFormatting += dgvSV_CellFormatting;
+
+            // --- TÌM KIẾM TỰ ĐỘNG (Auto Search) ---
+            // 1. Gõ chữ vào ô Mã lớp -> Tìm ngay
+            txtTimKiemTheoTen.TextChanged += (s, e) => {
+                // Nếu đang hiện placeholder thì không tìm
+                if (!isLoadingData && txtTimKiemTheoTen.Text != placeholderMaLop)
+                    TimKiemTuDong();
+            };
+
+            // 2. Gõ chữ vào ô Năm học -> Tìm ngay
+            txtTimTheoNam.TextChanged += (s, e) => {
+                if (!isLoadingData) TimKiemTuDong();
+            };
+
+            // 3. Chọn Khoa -> Lọc ngay
+            cbbTimTheoKhoa.SelectedIndexChanged += (s, e) => {
+                if (!isLoadingData) TimKiemTuDong();
+            };
+
+            // 4. Placeholder logic
+            txtTimKiemTheoTen.Enter += txtTimKiemTheoTen_Enter;
+            txtTimKiemTheoTen.Leave += txtTimKiemTheoTen_Leave;
+
+            // 5. Logic chọn khoa khi nhập liệu
+            cbbMaKhoa.SelectedIndexChanged += cbbMaKhoa_SelectedIndexChanged;
+        }
+
+        private void SetPlaceholderText()
+        {
+            txtTimKiemTheoTen.Text = placeholderMaLop;
+            txtTimKiemTheoTen.ForeColor = Color.Gray;
         }
 
         #endregion
 
-        #region Export Excel
-
-        private void btnXuatExcel_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (dgvSV.Rows.Count == 0)
-                {
-                    MessageBox.Show("Không có dữ liệu lớp tín chỉ để xuất!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Excel Files (*.csv)|*.csv|All Files (*.*)|*.*";
-                sfd.FileName = $"DanhSach_LopTC_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                sfd.Title = "Lưu file Excel";
-
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    ExportToCSV_LTC(sfd.FileName);
-                    MessageBox.Show($"✅ XUẤT FILE THÀNH CÔNG!\n\nĐường dẫn: {sfd.FileName}",
-                        "Xuất Excel thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi xuất file: {ex.Message}", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void ExportToCSV_LTC(string filePath)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
-            {
-                sb.AppendLine("DANH SÁCH LỚP TÍN CHỈ");
-                sb.AppendLine($"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
-                sb.AppendLine();
-
-                var headers = dgvSV.Columns.Cast<DataGridViewColumn>()
-                    .Where(c => c.Visible)
-                    .Select(c => EscapeCSV(c.HeaderText));
-                sb.AppendLine(string.Join(",", headers));
-
-                foreach (DataGridViewRow row in dgvSV.Rows)
-                {
-                    if (row.IsNewRow) continue;
-
-                    var cells = dgvSV.Columns.Cast<DataGridViewColumn>()
-                        .Where(c => c.Visible)
-                        .Select(c =>
-                        {
-                            var cellValue = row.Cells[c.Index].Value;
-                            if (c.Name == "TinhTrangLop")
-                            {
-                                return EscapeCSV(row.Cells[c.Index].FormattedValue?.ToString() ?? "Chưa phân công");
-                            }
-                            return EscapeCSV(cellValue?.ToString() ?? "");
-                        });
-
-                    sb.AppendLine(string.Join(",", cells));
-                }
-
-                sw.Write(sb.ToString());
-            }
-        }
-
-        private string EscapeCSV(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return "\"\"";
-
-            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
-            {
-                value = value.Replace("\"", "\"\"");
-                return $"\"{value}\"";
-            }
-
-            return value;
-        }
-
-        #endregion
-
-        #region Load Data
+        #region Load Data Helper
 
         private void LoadDataGridView()
         {
@@ -218,26 +134,10 @@ namespace BTL_LTTQ
             {
                 DataTable dt = bll.LoadDanhSachLTC();
                 dgvSV.DataSource = dt;
-
-                if (dgvSV.Columns["MaLop"] != null) 
-                    dgvSV.Columns["MaLop"].HeaderText = "Mã Lớp";
-                if (dgvSV.Columns["MaMH"] != null) 
-                    dgvSV.Columns["MaMH"].HeaderText = "Mã Môn Học";
-                if (dgvSV.Columns["TenMH"] != null) 
-                    dgvSV.Columns["TenMH"].HeaderText = "Tên Môn Học";
-                if (dgvSV.Columns["MaKhoa"] != null) 
-                    dgvSV.Columns["MaKhoa"].HeaderText = "Mã Khoa";
-                if (dgvSV.Columns["HocKy"] != null) 
-                    dgvSV.Columns["HocKy"].HeaderText = "Học Kỳ";
-                if (dgvSV.Columns["NamHoc"] != null) 
-                    dgvSV.Columns["NamHoc"].HeaderText = "Năm Học";
-                if (dgvSV.Columns["TinhTrangLop"] != null) 
-                    dgvSV.Columns["TinhTrangLop"].HeaderText = "Tình Trạng";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ LỖI TẢI DỮ LIỆU:\n\n{ex.Message}", 
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Lỗi tải dữ liệu: {ex.Message}", "Lỗi");
             }
         }
 
@@ -247,16 +147,18 @@ namespace BTL_LTTQ
             {
                 DataTable dtKhoa = bll.LoadDanhSachKhoa();
 
-                cbbMaKhoa.DataSource = dtKhoa;
+                // 1. Cbb Nhập liệu (Bắt buộc chọn)
+                cbbMaKhoa.DataSource = dtKhoa.Copy();
                 cbbMaKhoa.DisplayMember = "TenKhoa";
                 cbbMaKhoa.ValueMember = "MaKhoa";
                 cbbMaKhoa.SelectedIndex = -1;
 
+                // 2. Cbb Tìm kiếm (Có dòng Tất cả)
                 DataTable dtKhoaSearch = dtKhoa.Copy();
-                DataRow tatCaRow = dtKhoaSearch.NewRow();
-                tatCaRow["MaKhoa"] = "";
-                tatCaRow["TenKhoa"] = "--- Tất cả khoa ---";
-                dtKhoaSearch.Rows.InsertAt(tatCaRow, 0);
+                DataRow rowAll = dtKhoaSearch.NewRow();
+                rowAll["MaKhoa"] = "";
+                rowAll["TenKhoa"] = "--- Tất cả khoa ---";
+                dtKhoaSearch.Rows.InsertAt(rowAll, 0);
 
                 cbbTimTheoKhoa.DataSource = dtKhoaSearch;
                 cbbTimTheoKhoa.DisplayMember = "TenKhoa";
@@ -267,7 +169,7 @@ namespace BTL_LTTQ
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải danh sách Khoa/Môn học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải danh sách Khoa: " + ex.Message);
             }
         }
 
@@ -281,17 +183,74 @@ namespace BTL_LTTQ
                 cbbMaMon.ValueMember = "MaMH";
                 cbbMaMon.SelectedIndex = -1;
             }
+            catch { }
+        }
+
+        #endregion
+
+        #region TÌM KIẾM TỰ ĐỘNG (Logic mới)
+
+        private void TimKiemTuDong()
+        {
+            if (isLoadingData) return;
+
+            try
+            {
+                // Lấy từ khóa Mã lớp (bỏ qua placeholder)
+                string tuKhoa = txtTimKiemTheoTen.Text.Trim();
+                if (tuKhoa == placeholderMaLop) tuKhoa = "";
+
+                // Lấy Năm học
+                string namHocTim = txtTimTheoNam.Text.Trim();
+
+                // Lấy Mã khoa
+                string maKhoaTim = "";
+                if (cbbTimTheoKhoa.SelectedValue != null && cbbTimTheoKhoa.SelectedValue.ToString() != "")
+                {
+                    maKhoaTim = cbbTimTheoKhoa.SelectedValue.ToString();
+                }
+
+                // Gọi BLL tìm kiếm
+                DataTable dt = bll.TimKiemLTC(tuKhoa, namHocTim, maKhoaTim);
+                dgvSV.DataSource = dt;
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải danh sách Môn học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Không hiện MessageBox lỗi liên tục khi gõ phím để tránh khó chịu
+                // Console.WriteLine(ex.Message); 
             }
         }
 
+        // Nút Tìm kiếm (nếu vẫn muốn giữ nút này)
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            TimKiemTuDong();
+        }
+
+        // Nút Tất cả (Reset bộ lọc)
+        private void btnRefreshSearch_Click(object sender, EventArgs e)
+        {
+            isLoadingData = true; // Chặn sự kiện text change tạm thời
+
+            txtTimKiemTheoTen.Text = placeholderMaLop;
+            txtTimKiemTheoTen.ForeColor = Color.Gray;
+            txtTimTheoNam.Text = "";
+            cbbTimTheoKhoa.SelectedIndex = 0; // Về "Tất cả khoa"
+
+            isLoadingData = false;
+
+            LoadDataGridView(); // Load lại toàn bộ
+        }
+
+        #endregion
+
+        #region Validate & Nhập liệu
+
         private void ClearFields()
         {
-            txtMaLop.Text = ""; // ✅ ĐỔI TỪ tbMaLop
-            numHocKy.Value = 1; // ✅ ĐỔI TỪ numericUpDownHocky
-            txtNamHoc.Text = ""; // ✅ ĐỔI TỪ tbNamHoc
+            txtMaLop.Text = "";
+            numHocKy.Value = 1;
+            txtNamHoc.Text = "";
             cbbMaKhoa.SelectedIndex = -1;
             cbbMaMon.SelectedIndex = -1;
             txtMaLop.ReadOnly = false;
@@ -301,19 +260,14 @@ namespace BTL_LTTQ
         private LopTC_DTO GetLopTinChiFromGUI()
         {
             LopTC_DTO ltc = new LopTC_DTO();
-            ltc.MaLop = txtMaLop.Text.Trim(); // ✅ ĐỔI TỪ tbMaLop
+            ltc.MaLop = txtMaLop.Text.Trim();
             ltc.MaMH = cbbMaMon.SelectedValue?.ToString();
-            ltc.HocKy = (int)numHocKy.Value; // ✅ ĐỔI TỪ numericUpDownHocky
+            ltc.HocKy = (int)numHocKy.Value;
 
-            int namHoc;
-            if (int.TryParse(txtNamHoc.Text, out namHoc)) // ✅ ĐỔI TỪ tbNamHoc
-            {
+            if (int.TryParse(txtNamHoc.Text, out int namHoc))
                 ltc.NamHoc = namHoc;
-            }
             else
-            {
                 ltc.NamHoc = null;
-            }
 
             ltc.TinhTrangLop = false;
             return ltc;
@@ -321,274 +275,91 @@ namespace BTL_LTTQ
 
         #endregion
 
-        #region CRUD Events
+        #region CRUD (Thêm, Sửa, Xóa) - Đã Validate & Check Trùng
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMaLop.Text))
+            // 1. VALIDATE DỮ LIỆU
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text)) { MessageBox.Show("Mã lớp trống!", "Cảnh báo"); txtMaLop.Focus(); return; }
+            if (cbbMaKhoa.SelectedIndex == -1) { MessageBox.Show("Chưa chọn Khoa!", "Cảnh báo"); cbbMaKhoa.Focus(); return; }
+            if (cbbMaMon.SelectedIndex == -1) { MessageBox.Show("Chưa chọn Môn!", "Cảnh báo"); cbbMaMon.Focus(); return; }
+            if (string.IsNullOrWhiteSpace(txtNamHoc.Text)) { MessageBox.Show("Năm học trống!", "Cảnh báo"); txtNamHoc.Focus(); return; }
+
+            if (!int.TryParse(txtNamHoc.Text.Trim(), out int _))
             {
-                MessageBox.Show("Mã lớp không được để trống.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtMaLop.Focus();
-                return;
-            }
-            if (cbbMaMon.SelectedValue == null)
-            {
-                MessageBox.Show("Vui lòng chọn môn học.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cbbMaMon.Focus();
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(txtNamHoc.Text))
-            {
-                MessageBox.Show("Năm học không được để trống.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtNamHoc.Focus();
-                return;
-            }
-            int namHoc;
-            if (!int.TryParse(txtNamHoc.Text, out namHoc))
-            {
-                MessageBox.Show("Năm học phải là một con số.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtNamHoc.Focus();
-                return;
+                MessageBox.Show("Năm học phải là số (VD: 2025)!", "Lỗi nhập liệu");
+                txtNamHoc.Focus(); txtNamHoc.SelectAll(); return;
             }
 
+            // 2. CHECK TRÙNG MÃ
+            string maLop = txtMaLop.Text.Trim();
+            DataTable checkDt = bll.TimKiemLTC(maLop, "", "");
+            if (checkDt != null && checkDt.AsEnumerable().Any(r => r["MaLop"].ToString().ToLower() == maLop.ToLower()))
+            {
+                MessageBox.Show($"Mã lớp '{maLop}' đã tồn tại!", "Trùng mã", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMaLop.Focus(); txtMaLop.SelectAll(); return;
+            }
+
+            // 3. THÊM
             LopTC_DTO ltc = GetLopTinChiFromGUI();
-
-            try
+            if (bll.ThemLTC(ltc))
             {
-                if (bll.ThemLTC(ltc))
-                {
-                    MessageBox.Show("Thêm lớp tín chỉ thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadDataGridView();
-                    ClearFields();
-                }
-                else
-                {
-                    MessageBox.Show("Thêm lớp tín chỉ thất bại.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                MessageBox.Show("Thêm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadDataGridView();
+                ClearFields();
             }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627 || ex.Number == 2601)
-                {
-                    MessageBox.Show("Mã lớp này đã tồn tại. Vui lòng nhập mã khác.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    MessageBox.Show("Lỗi khi thêm: " + ex.Message, "Lỗi SQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi không xác định: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            else MessageBox.Show("Thêm thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || txtMaLop.ReadOnly == false)
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || !txtMaLop.ReadOnly)
             {
-                MessageBox.Show("Vui lòng chọn một lớp tín chỉ từ danh sách để sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Chọn lớp để sửa!", "Cảnh báo"); return;
             }
 
-            LopTC_DTO ltc = GetLopTinChiFromGUI();
-
-            try
+            if (MessageBox.Show("Cập nhật thông tin lớp?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
+                LopTC_DTO ltc = GetLopTinChiFromGUI();
                 if (bll.SuaLTC(ltc))
                 {
-                    MessageBox.Show("Cập nhật thông tin thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Cập nhật thành công!");
                     LoadDataGridView();
                     ClearFields();
                 }
-                else
-                {
-                    MessageBox.Show("Không tìm thấy lớp để cập nhật hoặc dữ liệu không đổi.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else MessageBox.Show("Cập nhật thất bại!");
             }
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || txtMaLop.ReadOnly == false)
+            if (string.IsNullOrWhiteSpace(txtMaLop.Text) || !txtMaLop.ReadOnly)
             {
-                MessageBox.Show("Vui lòng chọn một lớp từ danh sách để xóa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Chọn lớp để xóa!", "Cảnh báo"); return;
             }
 
-            DialogResult confirm = MessageBox.Show(
-                $"Bạn có chắc chắn muốn xóa Lớp Tín Chỉ (Mã: {txtMaLop.Text}) không?" +
-                $"\n\nCẢNH BÁO: Toàn bộ dữ liệu Phân công giảng dạy và Điểm số của sinh viên liên quan đến lớp này cũng sẽ bị xóa vĩnh viễn.",
-                "Xác nhận xóa",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (confirm == DialogResult.Yes)
+            if (MessageBox.Show($"Xóa lớp {txtMaLop.Text}? Dữ liệu phân công và điểm sẽ mất!",
+                "Cảnh báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                try
+                if (bll.XoaLTC(txtMaLop.Text))
                 {
-                    if (bll.XoaLTC(txtMaLop.Text))
-                    {
-                        MessageBox.Show("Xóa lớp tín chỉ và các dữ liệu liên quan thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadDataGridView();
-                        ClearFields();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Không tìm thấy lớp để xóa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    MessageBox.Show("Xóa thành công!");
+                    LoadDataGridView();
+                    ClearFields();
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Đã xảy ra lỗi trong quá trình xóa: " + ex.Message, "Lỗi SQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                else MessageBox.Show("Xóa thất bại!");
             }
         }
 
-        private void btnLamMoi_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnRefresh_Click
+        private void btnLamMoi_Click(object sender, EventArgs e)
         {
             ClearFields();
             LoadDataGridView();
-
-            txtTimKiemTheoTen.Text = placeholderMaLop;
-            txtTimKiemTheoTen.ForeColor = Color.Gray;
-            txtTimTheoNam.Text = "";
-            cbbTimTheoKhoa.SelectedIndex = 0;
         }
 
         #endregion
 
-        #region Search Events
-
-        private void btnSearch_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnTimKiem_Click
-        {
-            string tuKhoa = (txtTimKiemTheoTen.Text == placeholderMaLop) ? "" : txtTimKiemTheoTen.Text;
-            string namHocTim = txtTimTheoNam.Text;
-            string maKhoaTim = cbbTimTheoKhoa.SelectedValue?.ToString();
-
-            try
-            {
-                DataTable dt = bll.TimKiemLTC(tuKhoa, namHocTim, maKhoaTim);
-                dgvSV.DataSource = dt;
-
-                if (dt.Rows.Count == 0)
-                {
-                    MessageBox.Show("Không tìm thấy kết quả nào.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (FormatException fex)
-            {
-                MessageBox.Show(fex.Message, "Lỗi định dạng", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void btnRefreshSearch_Click(object sender, EventArgs e) // ✅ ĐỔI TỪ btnTatCa_Click
-        {
-            txtTimKiemTheoTen.Text = placeholderMaLop;
-            txtTimKiemTheoTen.ForeColor = Color.Gray;
-            txtTimTheoNam.Text = "";
-            cbbTimTheoKhoa.SelectedIndex = 0;
-
-            LoadDataGridView();
-        }
-
-        #endregion
-
-        #region UI Events
-
-        private void dgvSV_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            if (dgvSV.Columns[e.ColumnIndex].Name == "TinhTrangLop")
-            {
-                if (e.Value == null || e.Value == DBNull.Value)
-                {
-                    e.Value = "Chưa phân công";
-                    e.FormattingApplied = true;
-                    return;
-                }
-
-                bool isAssigned;
-
-                if (e.Value is bool)
-                    isAssigned = (bool)e.Value;
-                else if (e.Value is byte || e.Value is int)
-                    isAssigned = Convert.ToInt32(e.Value) == 1;
-                else
-                    return;
-
-                e.Value = isAssigned ? "Đã phân công" : "Chưa phân công";
-                e.FormattingApplied = true;
-            }
-        }
-
-        private void dgvSV_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                DataGridViewRow row = dgvSV.Rows[e.RowIndex];
-
-                txtMaLop.Text = row.Cells["MaLop"].Value?.ToString();
-                txtNamHoc.Text = row.Cells["NamHoc"].Value?.ToString();
-
-                if (row.Cells["HocKy"].Value != null && row.Cells["HocKy"].Value != DBNull.Value)
-                {
-                    numHocKy.Value = Convert.ToDecimal(row.Cells["HocKy"].Value);
-                }
-                else
-                {
-                    numHocKy.Value = 1;
-                }
-
-                string maKhoa = row.Cells["MaKhoa"].Value?.ToString();
-                if (!string.IsNullOrEmpty(maKhoa))
-                {
-                    cbbMaKhoa.SelectedValue = maKhoa;
-                }
-                else
-                {
-                    cbbMaKhoa.SelectedIndex = -1;
-                }
-
-                string maMH = row.Cells["MaMH"].Value?.ToString();
-                if (!string.IsNullOrEmpty(maMH))
-                {
-                    cbbMaMon.SelectedValue = maMH;
-                }
-                else
-                {
-                    cbbMaMon.SelectedIndex = -1;
-                }
-
-                txtMaLop.ReadOnly = true;
-            }
-        }
-
-        private void cbbMaKhoa_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cbbMaKhoa.SelectedValue != null)
-            {
-                string maKhoa = cbbMaKhoa.SelectedValue.ToString();
-                LoadMonHocComboBox(maKhoa);
-            }
-            else
-            {
-                LoadMonHocComboBox(null);
-            }
-        }
-
-        private void SetPlaceholderText()
-        {
-            txtTimKiemTheoTen.Text = placeholderMaLop;
-            txtTimKiemTheoTen.ForeColor = Color.Gray;
-        }
+        #region Placeholder Logic
 
         private void txtTimKiemTheoTen_Enter(object sender, EventArgs e)
         {
@@ -605,6 +376,75 @@ namespace BTL_LTTQ
             {
                 txtTimKiemTheoTen.Text = placeholderMaLop;
                 txtTimKiemTheoTen.ForeColor = Color.Gray;
+            }
+        }
+
+        private void cbbMaKhoa_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbbMaKhoa.SelectedValue != null)
+                LoadMonHocComboBox(cbbMaKhoa.SelectedValue.ToString());
+            else
+                LoadMonHocComboBox(null);
+        }
+
+        #endregion
+
+        #region Grid Interaction & Excel
+
+        private void dgvSV_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dgvSV.Columns[e.ColumnIndex].Name == "TinhTrangLop")
+            {
+                bool isAssigned = false;
+                if (e.Value is bool b) isAssigned = b;
+                else if (e.Value is int i) isAssigned = i == 1;
+
+                e.Value = isAssigned ? "Đã phân công" : "Chưa phân công";
+                e.FormattingApplied = true;
+            }
+        }
+
+        private void dgvSV_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            DataGridViewRow row = dgvSV.Rows[e.RowIndex];
+            txtMaLop.Text = row.Cells["MaLop"].Value?.ToString();
+            txtNamHoc.Text = row.Cells["NamHoc"].Value?.ToString();
+
+            if (decimal.TryParse(row.Cells["HocKy"].Value?.ToString(), out decimal hk))
+                numHocKy.Value = hk;
+
+            string maKhoa = row.Cells["MaKhoa"].Value?.ToString();
+            if (!string.IsNullOrEmpty(maKhoa)) cbbMaKhoa.SelectedValue = maKhoa;
+
+            string maMH = row.Cells["MaMH"].Value?.ToString();
+            if (!string.IsNullOrEmpty(maMH)) cbbMaMon.SelectedValue = maMH;
+
+            txtMaLop.ReadOnly = true; // Khóa mã lớp
+        }
+
+        private void btnXuatExcel_Click(object sender, EventArgs e)
+        {
+            if (dgvSV.Rows.Count == 0) { MessageBox.Show("Không có dữ liệu!"); return; }
+
+            SaveFileDialog sfd = new SaveFileDialog { Filter = "CSV (*.csv)|*.csv", FileName = $"DS_LopTC_{DateTime.Now:yyyyMMdd}.csv" };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("DANH SÁCH LỚP TÍN CHỈ");
+                // Header
+                sb.AppendLine(string.Join(",", dgvSV.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => "\"" + c.HeaderText + "\"")));
+                // Data
+                foreach (DataGridViewRow row in dgvSV.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    var cells = dgvSV.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Select(c => "\"" + (c.Name == "TinhTrangLop" ? row.Cells[c.Index].FormattedValue : row.Cells[c.Index].Value) + "\"");
+                    sb.AppendLine(string.Join(",", cells));
+                }
+                File.WriteAllText(sfd.FileName, sb.ToString(), Encoding.UTF8);
+                if (MessageBox.Show("Xuất xong! Mở file không?", "Thông báo", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    System.Diagnostics.Process.Start(sfd.FileName);
             }
         }
 

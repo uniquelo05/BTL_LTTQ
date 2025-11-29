@@ -308,6 +308,8 @@ namespace BTL_LTTQ
                 // Ẩn các menu chỉ dành cho Admin
                 btnGiangVien.Visible = false;
                 btnPhanCong.Visible = false;
+                btnLopTC.Visible = false;
+                btnMonHoc.Visible = false;
             }
         }
 

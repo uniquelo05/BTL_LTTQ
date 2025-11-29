@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using BTL_LTTQ.BLL.Diem;
 using BTL_LTTQ.DTO;
 using Excel = Microsoft.Office.Interop.Excel;
+using BTL_LTTQ.BLL.Session;
 
 namespace BTL_LTTQ
 {
@@ -110,8 +111,9 @@ namespace BTL_LTTQ
         {
             try
             {
-                DataTable dt = diemBLL.LayDanhSach();
-                dgvDiem.DataSource = dt;
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
+                dgvDiem.DataSource = diemBLL.LayDanhSach(maGV, loaiTaiKhoan);
                 dgvDiem.Refresh();
                 
                 // Đặt lại header text nếu cần
@@ -124,7 +126,7 @@ namespace BTL_LTTQ
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải dữ liệu: " + ex.Message);
             }
         }
 
@@ -180,20 +182,14 @@ namespace BTL_LTTQ
         {
             try
             {
-                Score newScore = GetScoreFromInputs();
-                
-                if (string.IsNullOrWhiteSpace(newScore.MaLop) || string.IsNullOrWhiteSpace(newScore.MaSV))
-                {
-                    MessageBox.Show("Vui lòng nhập đầy đủ Mã lớp và Mã SV!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                
-                string result = diemBLL.ThemDiem(newScore);
+                Score diem = GetScoreFromInputs();
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
 
-                MessageBox.Show(result, "Thông báo", MessageBoxButtons.OK, 
-                    result.Contains("thành công") ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
-                
-                if (result.Contains("Thêm thành công!") || result.Contains("thành công"))
+                string result = diemBLL.ThemDiem(diem, maGV, loaiTaiKhoan);
+                MessageBox.Show(result);
+
+                if (result == "Thêm thành công!")
                 {
                     LoadData();
                     ClearInputs();
@@ -201,7 +197,7 @@ namespace BTL_LTTQ
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi thêm: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi thêm điểm: " + ex.Message);
             }
         }
 
@@ -278,6 +274,8 @@ namespace BTL_LTTQ
         {
             try
             {
+                string maGV = UserSession.Instance.MaGV;
+                string loaiTaiKhoan = UserSession.Instance.LoaiTaiKhoan;
                 string maLop = txtSearchMaLop.Text.Trim();
                 string maSV = txtSearchMaSV.Text.Trim();
 
@@ -291,7 +289,7 @@ namespace BTL_LTTQ
                     return;
                 }
 
-                DataTable dt = diemBLL.TimKiem(maLop, maSV);
+                DataTable dt = diemBLL.TimKiem(maLop, maSV, maGV, loaiTaiKhoan);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
@@ -306,7 +304,7 @@ namespace BTL_LTTQ
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message);
             }
         }
 
@@ -373,13 +371,24 @@ namespace BTL_LTTQ
         {
             try
             {
+                // Hộp thoại chọn nơi lưu file
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Title = "Lưu file Excel";
+                saveFileDialog.Filter = "Excel File (*.xlsx)|*.xlsx";
+                saveFileDialog.FileName = "DanhSach.xlsx";
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                // Tạo Excel Application
                 Excel.Application excelApp = new Excel.Application();
-                excelApp.Application.Workbooks.Add(Type.Missing);
+                Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+                Excel.Worksheet worksheet = workbook.ActiveSheet;
 
                 // Đặt tiêu đề cột
                 for (int i = 1; i <= dgv.Columns.Count; i++)
                 {
-                    excelApp.Cells[1, i] = dgv.Columns[i - 1].HeaderText;
+                    worksheet.Cells[1, i] = dgv.Columns[i - 1].HeaderText;
                 }
 
                 // Ghi dữ liệu từng dòng
@@ -387,20 +396,25 @@ namespace BTL_LTTQ
                 {
                     for (int j = 0; j < dgv.Columns.Count; j++)
                     {
-                        excelApp.Cells[i + 2, j + 1] = dgv.Rows[i].Cells[j].Value?.ToString();
+                        worksheet.Cells[i + 2, j + 1] = dgv.Rows[i].Cells[j].Value?.ToString();
                     }
                 }
 
-                // Hiện file Excel
-                excelApp.Visible = true;
+                // Lưu file vào đường dẫn đã chọn
+                workbook.SaveAs(saveFileDialog.FileName);
+                workbook.Close();
+                excelApp.Quit();
 
-                MessageBox.Show("Xuất Excel thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Xuất Excel thành công!", "Thông báo",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi xuất Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi xuất Excel: " + ex.Message,
+                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         #endregion
     }

@@ -9,10 +9,19 @@ namespace BTL_LTTQ.BLL
     {
         private SinhVienDAL dal = new SinhVienDAL();
 
-        public DataTable TimKiem(string maKhoa, string maLop, string maSV) => dal.TimKiem(maKhoa, maLop, maSV);
+        public DataTable TimKiem(string maKhoa, string maLop, string maSV, string maGV, string loaiTaiKhoan)
+        {
+            return dal.TimKiem(maKhoa, maLop, maSV, maGV, loaiTaiKhoan);
+        }
         public DataTable LayKhoa() => dal.LayKhoa();
-        public DataTable LayTatCaLopTinChi() => dal.LayTatCaLopTinChi();
-        public DataTable LayLopTinChiTheoKhoa(string maKhoa) => dal.LayLopTinChiTheoKhoa(maKhoa);
+        public DataTable LayTatCaLopTinChi(string maGV, string loaiTaiKhoan)
+        {
+            return dal.LayTatCaLopTinChi(maGV, loaiTaiKhoan);
+        }
+        public DataTable LayLopTinChiTheoKhoa(string maKhoa, string maGV, string loaiTaiKhoan)
+        {
+            return dal.LayLopTinChiTheoKhoa(maKhoa, maGV, loaiTaiKhoan);
+        }
         public bool Them(SinhVienDTO sv) => dal.Them(sv);
         public bool Sua(SinhVienDTO sv) => dal.Sua(sv);
         public bool Xoa(string maSV, string maLop) => dal.Xoa(maSV, maLop);

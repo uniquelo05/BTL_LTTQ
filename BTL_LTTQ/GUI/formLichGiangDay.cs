@@ -71,13 +71,16 @@ namespace BTL_LTTQ.GUI
 
         #region Khởi Tạo Lưới
 
-        private void InitializeScheduleGrid()
+        private void InitializeScheduleGrid(DateTime? tuanStart = null)
         {
             dgvSchedule.Rows.Clear();
 
             // Ngăn sort
             foreach (DataGridViewColumn col in dgvSchedule.Columns)
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
+            //
+            dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dgvSchedule.ColumnHeadersHeight = 60; // Đặt chiều cao tiêu đề là 45px (bạn có thể điều chỉnh)
 
             // ✅ 5 ca cố định
             dgvSchedule.Rows.Add("Ca 1", "7h00 - 9h30", "", "", "", "", "", "", "");
@@ -85,11 +88,34 @@ namespace BTL_LTTQ.GUI
             dgvSchedule.Rows.Add("Ca 3", "13h00 - 15h30", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 4", "15h35 - 18h00", "", "", "", "", "", "", "");
             dgvSchedule.Rows.Add("Ca 5", "18h30 - 21h00", "", "", "", "", "", "", "");
+            if (tuanStart.HasValue)
+            {
+                DateTime startDay = GetStartOfWeek(tuanStart.Value);
 
+                // Sử dụng định dạng "Thứ X\n(dd/MM)"
+                dgvSchedule.Columns["colThuHai"].HeaderText = $"Thứ Hai\n({startDay:dd/MM})";
+                dgvSchedule.Columns["colThuBa"].HeaderText = $"Thứ Ba\n({startDay.AddDays(1):dd/MM})";
+                dgvSchedule.Columns["colThuTu"].HeaderText = $"Thứ Tư\n({startDay.AddDays(2):dd/MM})";
+                dgvSchedule.Columns["colThuNam"].HeaderText = $"Thứ Năm\n({startDay.AddDays(3):dd/MM})";
+                dgvSchedule.Columns["colThuSau"].HeaderText = $"Thứ Sáu\n({startDay.AddDays(4):dd/MM})";
+                dgvSchedule.Columns["colThuBay"].HeaderText = $"Thứ Bảy\n({startDay.AddDays(5):dd/MM})";
+                dgvSchedule.Columns["colChuNhat"].HeaderText = $"Chủ Nhật\n({startDay.AddDays(6):dd/MM})";
+            }
+            else
+            {
+                // Khởi tạo mặc định nếu chưa có tuần
+                dgvSchedule.Columns["colThuHai"].HeaderText = "Thứ Hai";
+                dgvSchedule.Columns["colThuBa"].HeaderText = "Thứ Ba";
+                dgvSchedule.Columns["colThuTu"].HeaderText = "Thứ Tư";
+                dgvSchedule.Columns["colThuNam"].HeaderText = "Thứ Năm";
+                dgvSchedule.Columns["colThuSau"].HeaderText = "Thứ Sáu";
+                dgvSchedule.Columns["colThuBay"].HeaderText = "Thứ Bảy";
+                dgvSchedule.Columns["colChuNhat"].HeaderText = "Chủ Nhật";
+            }
             // Style cho cột Ca và Giờ
             dgvSchedule.Columns["colCa"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvSchedule.Columns["colCa"].DefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            
+
             dgvSchedule.Columns["colGio"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvSchedule.Columns["colGio"].DefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9F);
 
@@ -111,6 +137,12 @@ namespace BTL_LTTQ.GUI
             dgvSchedule.Columns["colChuNhat"].DefaultCellStyle = cellStyle;
 
             dgvSchedule.ClearSelection();
+        }
+        private DateTime GetStartOfWeek(DateTime date)
+        {
+            // Thứ Hai là ngày đầu tuần
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+            return date.AddDays(-1 * diff).Date;
         }
 
         #endregion
@@ -152,9 +184,8 @@ namespace BTL_LTTQ.GUI
                 // 5. Lấy lịch
                 var list = scheduleBLL.LoadSchedule(maGV, tuanStart, tuanEnd);
 
-                // 6. Xóa + khởi tạo lại
-                InitializeScheduleGrid();
-
+                // 6. Xóa + khởi tạo lại và truyền TUANSTART để đặt tiêu đề
+                InitializeScheduleGrid(tuanStart); // ĐÃ THAY ĐỔI!
                 // 7. Đổ dữ liệu
                 foreach (var item in list)
                 {
